@@ -1,0 +1,8 @@
+#ignore the classes
+classes/
+
+#ignore .idea folder
+.idea/
+
+#ignore .settings folder
+.settings/

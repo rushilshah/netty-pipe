@@ -15,6 +15,8 @@
  */
 package gash.router.server.edges;
 
+import gash.router.container.RoutingConf;
+import gash.router.server.RoutingConfObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +29,9 @@ import pipe.work.Work.WorkState;
 
 import gash.router.client.CommConnection;
 
-public class EdgeMonitor implements EdgeListener, Runnable {
+import java.util.Collection;
+
+public class EdgeMonitor implements EdgeListener, Runnable{
 	protected static Logger logger = LoggerFactory.getLogger("edge monitor");
 
 	private EdgeList outboundEdges;
@@ -45,15 +49,20 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		this.state = state;
 		this.state.setEmon(this);
 
+		EdgeInfo newOutboundEdge;
 		if (state.getConf().getRouting() != null) {
 			for (RoutingEntry e : state.getConf().getRouting()) {
-				outboundEdges.addNode(e.getId(), e.getHost(), e.getPort());
+				newOutboundEdge = outboundEdges.addNode(e.getId(), e.getHost(), e.getPort());
+				if(newOutboundEdge!= null)
+					onAdd(newOutboundEdge);
 			}
 		}
 
 		// cannot go below 2 sec
 		if (state.getConf().getHeartbeatDt() > this.dt)
 			this.dt = state.getConf().getHeartbeatDt();
+
+		newOutboundEdge = null;
 	}
 
 	public void createInboundIfNew(int ref, String host, int port) {
@@ -76,7 +85,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
 		wb.setHeader(hb);
 		wb.setBeat(bb);
-		wb.setSecret(12345678);//added by manthan
+		wb.setSecret(12345678);//added by Manthan
 		return wb.build();
 	}
 
@@ -93,7 +102,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 						WorkMessage wm = createHB(ei);
 						ei.getChannel().writeAndFlush(wm);
 					} else {
-						// TODO create a client to the node
+						// TODO create a client to the node // added by Manthan
 						logger.info("trying to connect to node " + ei.getRef());
 						CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
 						ei.setChannel(commC.getChannel());
@@ -110,6 +119,9 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		}
 	}
 
+	/**
+	 * Author : Manthan
+	 * */
 	@Override
 	public synchronized void onAdd(EdgeInfo ei) {
 		// TODO check connection //added by Manthan
@@ -122,6 +134,9 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		}
 	}
 
+	/**
+	 * Author : Manthan
+	 * */
 	@Override
 	public synchronized void onRemove(EdgeInfo ei) {
 		// TODO ? //added by Manthan
@@ -129,9 +144,37 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			logger.info("Edge removed, trying to disconnect to node " + ei.getRef());		
 			ei.getChannel().close();
 			ei.setActive(false);
-			outboundEdges.removeNode(ei.getRef());
 			logger.info("Edge removed and disconnected from node " + ei.getRef() + ei.isActive());
-			ei = null; // making it available for garbage collection
 		}
+	}
+
+	/**
+	 * Author : Manthan
+	 * */
+	public Collection<EdgeInfo> getOutboundEdgeInfoList(){
+		return outboundEdges.map.values();
+	}
+
+	/**
+	 * Author : Manthan
+	 * */
+	public void updateState(ServerState newState){
+		EdgeInfo newOutboundEdge = null;
+		this.state = newState;
+		this.state.setEmon(this);
+
+		if (state.getConf().getRouting() != null) {
+			for (RoutingEntry e : state.getConf().getRouting()) {
+				newOutboundEdge = outboundEdges.createIfNew(e.getId(), e.getHost(), e.getPort());
+				if(newOutboundEdge!= null)
+					onAdd(newOutboundEdge);
+			}
+		}
+
+		// cannot go below 2 sec
+		if (state.getConf().getHeartbeatDt() > this.dt)
+			this.dt = state.getConf().getHeartbeatDt();
+
+		newOutboundEdge = null;
 	}
 }

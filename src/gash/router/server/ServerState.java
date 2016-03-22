@@ -4,7 +4,7 @@ import gash.router.container.RoutingConf;
 import gash.router.server.edges.EdgeMonitor;
 import gash.router.server.tasks.TaskList;
 
-public class ServerState {
+public class ServerState implements RoutingConfObserver{
 	private RoutingConf conf;
 	private EdgeMonitor emon;
 	private TaskList tasks;
@@ -31,6 +31,18 @@ public class ServerState {
 
 	public void setTasks(TaskList tasks) {
 		this.tasks = tasks;
+	}
+
+	/**
+	 * Update state with latest confFile
+	 *
+	 * @author Manthan
+	 *
+	 */
+	@Override
+	public void updateRoutingConf(RoutingConf newConf){
+		setConf(newConf);
+		emon.updateState(this);
 	}
 
 }

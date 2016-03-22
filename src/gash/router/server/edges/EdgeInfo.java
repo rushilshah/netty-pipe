@@ -29,6 +29,7 @@ public class EdgeInfo {
 		this.ref = ref;
 		this.host = host;
 		this.port = port;
+		this.channel = null;
 	}
 
 	public int getRef() {

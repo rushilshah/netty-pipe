@@ -78,6 +78,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				// PrintUtil.printFailure(err);
 			} else if (msg.hasTask()) {
 				Task t = msg.getTask();
+				state.getTasks().addTask(t);
 			} else if (msg.hasState()) {
 				WorkState s = msg.getState();
 			}

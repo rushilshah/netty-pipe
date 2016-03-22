@@ -21,6 +21,7 @@ public class EdgeList {
 	protected HashMap<Integer, EdgeInfo> map = new HashMap<Integer, EdgeInfo>();
 
 	public EdgeList() {
+
 	}
 
 	public EdgeInfo createIfNew(int ref, String host, int port) {
@@ -61,7 +62,7 @@ public class EdgeList {
 	}
 
 	public void removeNode(int ref) {
-		map.remove(ref);
+			map.remove(ref);
 	}
 
 	public void clear() {

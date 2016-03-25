@@ -19,6 +19,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -36,15 +37,17 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-public class MessageServer {
+public class MessageServer implements RoutingConfSubject, Runnable{
 	protected static Logger logger = LoggerFactory.getLogger("server");
 
 	protected static HashMap<Integer, ServerBootstrap> bootstrap = new HashMap<Integer, ServerBootstrap>();
-	//private EdgeMonitor emon;
+	private static EdgeMonitor emon=null; // added by Manthan
+	private ArrayList<RoutingConfObserver> routingConfOberverList;// added by Manthan
 
 	// public static final String sPort = "port";
 	// public static final String sPoolSize = "pool.size";
 
+	protected File confFile; // added by Manthan
 	protected RoutingConf conf;
 	protected boolean background = false;
 
@@ -54,6 +57,8 @@ public class MessageServer {
 	 * @param cfg
 	 */
 	public MessageServer(File cfg) {
+		routingConfOberverList = new ArrayList<>();
+		this.confFile = cfg;
 		init(cfg);
 	}
 
@@ -66,6 +71,7 @@ public class MessageServer {
 
 	public void startServer() {
 		StartWorkCommunication comm = new StartWorkCommunication(conf);
+		attach(comm);
 		logger.info("Work starting");
 
 		// We always start the worker in the background
@@ -82,6 +88,10 @@ public class MessageServer {
 			} else
 				comm2.run();
 		}
+
+		// Start the thread that reads any updates in conf File : thread in background // Added by Manthan
+		Thread confUpdateThread = new Thread(this);
+		confUpdateThread.start();
 	}
 
 	/**
@@ -122,6 +132,91 @@ public class MessageServer {
 		return (conf != null);
 	}
 
+	/*Started by Manthan*/
+	/**
+	 * Thread to regularly read updated conf file
+	 *
+	 * @author Manthan
+	 *
+	 */
+	@Override
+	public void run(){
+
+		BufferedInputStream br;
+		byte[] raw;
+		while(true){
+
+			br=null;
+			raw=null;
+			if (!confFile.exists())
+				throw new RuntimeException(confFile.getAbsolutePath() + " not found");
+			// resource initialization - how message are processed
+
+			try {
+				raw = new byte[(int) confFile.length()];
+				br = new BufferedInputStream(new FileInputStream(confFile));
+				br.read(raw);
+				conf = JsonUtil.decode(new String(raw), RoutingConf.class);
+				if (!verifyConf(conf))
+					throw new RuntimeException("verification of configuration failed");
+				notifyObservers();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			} finally {
+				if (br != null) {
+					try {
+						br.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				//make thread sleep for 3000 miliseconds
+				try{
+					Thread.sleep(3000);
+				}
+				catch(InterruptedException e){
+					e.printStackTrace();
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * Attach observer for changes in conf file
+	 *
+	 * @author Manthan
+	 *
+	 */
+	@Override
+	public void attach(RoutingConfObserver observer) {
+		routingConfOberverList.add(observer);
+	}
+
+	/**
+	 * Detach observer for changes in conf file
+	 *
+	 * @author Manthan
+	 *
+	 */
+	@Override
+	public void detach(RoutingConfObserver observer) {
+		routingConfOberverList.remove(observer);
+	}
+
+	/**
+	 * Notify observers for changes in conf file
+	 *
+	 * @author Manthan
+	 *
+	 */
+	@Override
+	public void notifyObservers() {
+		for(RoutingConfObserver observer : routingConfOberverList){
+			observer.updateRoutingConf(conf);
+		}
+	}
+	/**Ended by Manthan*/
 	/**
 	 * initialize netty communication
 	 * 
@@ -182,9 +277,8 @@ public class MessageServer {
 	 *
 	 *            The port to listen to
 	 */
-	private static class StartWorkCommunication implements Runnable {
+	private static class StartWorkCommunication implements Runnable, RoutingConfObserver {
 		ServerState state;
-		EdgeMonitor emon;
 
 		public StartWorkCommunication(RoutingConf conf) {
 			if (conf == null)
@@ -196,7 +290,7 @@ public class MessageServer {
 			TaskList tasks = new TaskList(new NoOpBalancer());
 			state.setTasks(tasks);
 
-			emon = new EdgeMonitor(state);//changed by Manthan -> emon is instance of parent class
+			emon = new EdgeMonitor(state);//changed by Manthan -> emon is an instance of parent class
 			Thread t = new Thread(emon);
 			t.start();
 		}
@@ -246,6 +340,17 @@ public class MessageServer {
 					emon.shutdown();
 			}
 		}
+
+		/**
+		 * Update state with latest confFile
+		 *
+		 * @author Manthan
+		 *
+		 */
+		@Override
+		public void updateRoutingConf(RoutingConf newConf){
+			state.updateRoutingConf(newConf);
+		}
 	}
 
 	/**
@@ -286,6 +391,16 @@ public class MessageServer {
 				return null;
 			}
 		}
+	}
+
+	/**
+	 * return the object of EdgeMonitor
+	 *
+	 * @author Manthan
+	 *
+	 */
+	public static EdgeMonitor getEmon(){
+		return emon;
 	}
 
 }

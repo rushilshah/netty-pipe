@@ -15,6 +15,7 @@
  */
 package gash.router.server;
 
+import gash.router.server.edges.EdgeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
+import pipe.work.Work;
+import pipe.work.Work.WorkMessage;
 import routing.Pipe.CommandMessage;
 
 /**
@@ -60,9 +63,30 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		PrintUtil.printCommand(msg);
 
 		try {
-			// TODO How can you implement this without if-else statements?
+			// TODO How can you implement this without if-else statements? // changes added by Manthan
 			if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
+				if(msg.getHeader().getDestinationHost().equals(Integer.toString( conf.getCommandPort()))){
+					//handle message by self
+					System.out.println("Message for me: "+ msg.getMessage() + " from "+ msg.getHeader().getSourceHost());
+				}
+				else{ //message doesn't belong to current node. Forward on other edges
+					if(MessageServer.getEmon() != null){// forward if Comm-worker port is active
+						for(EdgeInfo ei :MessageServer.getEmon().getOutboundEdgeInfoList()){
+							if(ei.isActive() && ei.getChannel() != null){// check if channel of outbound edge is active
+								WorkMessage.Builder wb = WorkMessage.newBuilder();
+								wb.setHeader(msg.getHeader());
+								wb.setSecret(1234567809);
+								wb.setPing(true);
+								ei.getChannel().writeAndFlush(wb.build());
+							}
+						}
+					}
+					else{// drop the message or queue it for limited time to send to connected node
+						//todo
+					}
+
+				}
 			} else if (msg.hasMessage()) {
 				logger.info(msg.getMessage());
 			} else {

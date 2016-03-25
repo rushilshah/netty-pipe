@@ -68,6 +68,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				logger.debug("heartbeat from " + msg.getHeader().getNodeId());
 			} else if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
+				System.out.println("ping from " + msg.getHeader().getNodeId() + " host: " + msg.getHeader().getSourceHost());
 				boolean p = msg.getPing();
 				WorkMessage.Builder rb = WorkMessage.newBuilder();
 				rb.setPing(true);

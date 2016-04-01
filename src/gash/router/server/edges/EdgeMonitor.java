@@ -15,14 +15,6 @@
  */
 package gash.router.server.edges;
 
-import gash.router.server.CommandInit;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +35,6 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
-
-	//BOC Pranav
-	private EventLoopGroup group;
-	private ChannelFuture channel;
-	//EOC
 
 	public EdgeMonitor(ServerState state) {
 		if (state == null)
@@ -99,9 +86,6 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 	@Override
 	public void run() {
-
-		group = new NioEventLoopGroup(); // Changed by pranav
-
 		while (forever) {
 			try {
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
@@ -111,11 +95,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					} else {
 						// TODO create a client to the node
 						logger.info("trying to connect to node " + ei.getRef());
-						Channel ch = createChannel(ei.getHost(),ei.getPort()); //Pranav
 						CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
-						ei.setChannel(ch); // Pranav
+						ei.setChannel(commC.getChannel());
 						ei.setActive(true);
-						logger.info("channel connected to node " + ei.getRef() + ei.isActive());
+						logger.info("connected to node " + ei.getRef() + ei.isActive());
 					}
 				}
 
@@ -127,24 +110,6 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		}
 	}
 
-	public Channel createChannel(String host, int port)
-	{
-		try {
-			CommandInit si = new CommandInit(null, false);
-			Bootstrap b = new Bootstrap();
-			b.group(group).channel(NioSocketChannel.class).handler(si);
-			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
-			b.option(ChannelOption.TCP_NODELAY, true);
-			b.option(ChannelOption.SO_KEEPALIVE, true);
-
-			channel = b.connect(host, port).syncUninterruptibly();
-		}
-		catch (Throwable ex)
-		{
-			logger.error("Channel creation failed",ex);
-		}
-		return channel.channel();
-	}
 	@Override
 	public synchronized void onAdd(EdgeInfo ei) {
 		// TODO check connection //added by Manthan

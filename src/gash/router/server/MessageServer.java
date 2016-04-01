@@ -37,7 +37,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-public class MessageServer implements RoutingConfSubject, Runnable{
+public class MessageServer implements RoutingConfSubject{//}, Runnable{
 	protected static Logger logger = LoggerFactory.getLogger("server");
 
 	protected static HashMap<Integer, ServerBootstrap> bootstrap = new HashMap<Integer, ServerBootstrap>();
@@ -73,10 +73,14 @@ public class MessageServer implements RoutingConfSubject, Runnable{
 		StartWorkCommunication comm = new StartWorkCommunication(conf);
 		attach(comm);
 		logger.info("Work starting");
-
 		// We always start the worker in the background
 		Thread cthread = new Thread(comm);
 		cthread.start();
+
+		// Start the thread that reads any updates in conf File : thread in background // Added by Manthan
+		logger.info("Conf updater starting");
+		Thread confUpdateThread = new Thread(new StartRoutingUpdater(this));
+		confUpdateThread.start();
 
 		if (!conf.isInternalNode()) {
 			StartCommandCommunication comm2 = new StartCommandCommunication(conf);
@@ -89,9 +93,11 @@ public class MessageServer implements RoutingConfSubject, Runnable{
 				comm2.run();
 		}
 
-		// Start the thread that reads any updates in conf File : thread in background // Added by Manthan
+		/*// Start the thread that reads any updates in conf File : thread in background // Added by Manthan
+		logger.info("Conf update thread starting");
 		Thread confUpdateThread = new Thread(this);
-		confUpdateThread.start();
+		confUpdateThread.start();*/
+
 	}
 
 	/**
@@ -132,55 +138,6 @@ public class MessageServer implements RoutingConfSubject, Runnable{
 		return (conf != null);
 	}
 
-	/*Started by Manthan*/
-	/**
-	 * Thread to regularly read updated conf file
-	 *
-	 * @author Manthan
-	 *
-	 */
-	@Override
-	public void run(){
-
-		BufferedInputStream br;
-		byte[] raw;
-		while(true){
-
-			br=null;
-			raw=null;
-			if (!confFile.exists())
-				throw new RuntimeException(confFile.getAbsolutePath() + " not found");
-			// resource initialization - how message are processed
-
-			try {
-				raw = new byte[(int) confFile.length()];
-				br = new BufferedInputStream(new FileInputStream(confFile));
-				br.read(raw);
-				conf = JsonUtil.decode(new String(raw), RoutingConf.class);
-				if (!verifyConf(conf))
-					throw new RuntimeException("verification of configuration failed");
-				notifyObservers();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			} finally {
-				if (br != null) {
-					try {
-						br.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				//make thread sleep for 3000 miliseconds
-				try{
-					Thread.sleep(3000);
-				}
-				catch(InterruptedException e){
-					e.printStackTrace();
-				}
-			}
-		}
-
-	}
 
 	/**
 	 * Attach observer for changes in conf file
@@ -325,12 +282,14 @@ public class MessageServer implements RoutingConfSubject, Runnable{
 
 				// block until the server socket is closed.
 				f.channel().closeFuture().sync();
+				logger.info("I am done");
 
 			} catch (Exception ex) {
 				// on bind().sync()
 				logger.error("Failed to setup handler.", ex);
 			} finally {
 				// Shut down all event loops to terminate all threads.
+				logger.info("Finally being executed");
 				bossGroup.shutdownGracefully();
 				workerGroup.shutdownGracefully();
 
@@ -338,6 +297,7 @@ public class MessageServer implements RoutingConfSubject, Runnable{
 				EdgeMonitor emon = state.getEmon();
 				if (emon != null)
 					emon.shutdown();
+				logger.info("Finally execution done");
 			}
 		}
 
@@ -350,6 +310,71 @@ public class MessageServer implements RoutingConfSubject, Runnable{
 		@Override
 		public void updateRoutingConf(RoutingConf newConf){
 			state.updateRoutingConf(newConf);
+		}
+	}
+
+	/**
+	 * initialize netty communication
+	 * @author manthan
+	 */
+	private static class StartRoutingUpdater implements Runnable {
+		File confFile;
+		//RoutingConf conf;
+		MessageServer svr;
+
+		public StartRoutingUpdater(MessageServer svr) {
+			this.svr = svr;
+			this.confFile = this.svr.confFile;
+		}
+
+		/**
+		 * Thread to regularly read updated conf file
+		 *
+		 * @author Manthan
+		 *
+		 */
+		@Override
+		public void run(){
+
+			BufferedInputStream br;
+			byte[] raw;
+			while(true){
+				br=null;
+				raw=null;
+				if (!confFile.exists())
+					throw new RuntimeException(confFile.getAbsolutePath() + " not found");
+				// resource initialization - how message are processed
+
+				try {
+					//logger.info("Updating conf file ...");
+					raw = new byte[(int) confFile.length()];
+					br = new BufferedInputStream(new FileInputStream(confFile));
+					br.read(raw);
+					this.svr.conf = JsonUtil.decode(new String(raw), RoutingConf.class);
+					if (!this.svr.verifyConf(this.svr.conf))
+						throw new RuntimeException("verification of configuration failed");
+					this.svr.notifyObservers();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				} finally {
+					if (br != null) {
+						try {
+							br.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					//make thread sleep for 3000 miliseconds
+					try{
+						//logger.info("Conf update sleeping...");
+						Thread.sleep(3000);
+					}
+					catch(InterruptedException e){
+						e.printStackTrace();
+					}
+				}
+			}
+
 		}
 	}
 

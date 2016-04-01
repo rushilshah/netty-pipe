@@ -54,6 +54,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	 * @param msg
 	 */
 	public void handleMessage(CommandMessage msg, Channel channel) {
+		boolean msgDropFlag;
 		if (msg == null) {
 			// TODO add logging
 			System.out.println("ERROR: Unexpected content - " + msg);
@@ -71,16 +72,22 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 					System.out.println("Message for me: "+ msg.getMessage() + " from "+ msg.getHeader().getSourceHost());
 				}
 				else{ //message doesn't belong to current node. Forward on other edges
+					msgDropFlag = true;
 					if(MessageServer.getEmon() != null){// forward if Comm-worker port is active
 						for(EdgeInfo ei :MessageServer.getEmon().getOutboundEdgeInfoList()){
 							if(ei.isActive() && ei.getChannel() != null){// check if channel of outbound edge is active
+								logger.info("Workmessage being sent");
 								WorkMessage.Builder wb = WorkMessage.newBuilder();
 								wb.setHeader(msg.getHeader());
 								wb.setSecret(1234567809);
 								wb.setPing(true);
 								ei.getChannel().writeAndFlush(wb.build());
+								msgDropFlag = false;
+								logger.info("Workmessage sent");
 							}
 						}
+						if(msgDropFlag)
+							logger.info("Message dropped <node,message>: <" + msg.getHeader().getNodeId()+"," + msg.getMessage()+">");
 					}
 					else{// drop the message or queue it for limited time to send to connected node
 						//todo

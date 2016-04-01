@@ -181,16 +181,36 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	 * Author : Manthan
 	 * */
 	public void updateState(ServerState newState){
+		//logger.info("Update State started.....");
 		EdgeInfo newOutboundEdge = null;
 		this.state = newState;
 		this.state.setEmon(this);
 
 		if (state.getConf().getRouting() != null) {
+
+			EdgeList newOutBoundEdges = new EdgeList();
 			for (RoutingEntry e : state.getConf().getRouting()) {
-				newOutboundEdge = outboundEdges.createIfNew(e.getId(), e.getHost(), e.getPort());
-				if(newOutboundEdge!= null)
-					onAdd(newOutboundEdge);
+
+
+				newOutboundEdge = outboundEdges.returnAndRemoveIfNotNew(e.getId(), e.getHost(), e.getPort());
+				if(newOutboundEdge != null){
+					//Edge already exists. Simply add it to new Map
+					newOutBoundEdges.map.put(newOutboundEdge.getRef(),newOutboundEdge);
+				}
+				else{
+					//edge is new and doen't exist
+					newOutboundEdge = newOutBoundEdges.addNode(e.getId(), e.getHost(), e.getPort());
+					if(newOutboundEdge!= null)
+						onAdd(newOutboundEdge);
+				}
 			}
+			for(EdgeInfo ei : outboundEdges.map.values()){
+				onRemove(ei);
+			}
+			outboundEdges.clear();
+			outboundEdges = null; // for garbage collection
+			outboundEdges = newOutBoundEdges;
+
 		}
 
 		// cannot go below 2 sec
@@ -198,5 +218,6 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			this.dt = state.getConf().getHeartbeatDt();
 
 		newOutboundEdge = null;
+		//logger.info("Update State done.....");
 	}
 }

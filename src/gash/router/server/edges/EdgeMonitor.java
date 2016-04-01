@@ -15,6 +15,14 @@
  */
 package gash.router.server.edges;
 
+import gash.router.client.CommWorker;
+import gash.router.server.CommandInit;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +43,9 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
+	private EventLoopGroup group;
+	private ChannelFuture channel;
+	private CommWorker worker;
 
 	public EdgeMonitor(ServerState state) {
 		if (state == null)
@@ -86,9 +97,25 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 	@Override
 	public void run() {
+
+		group = new NioEventLoopGroup(); // Changed by pranav
+
 		while (forever) {
 			try {
+				/* BOC
+				changed by Pranav
+				 */
+				CommandInit si = new CommandInit(null,false);
+				Bootstrap b = new Bootstrap();
+				b.group(group).channel(NioSocketChannel.class).handler(si);
+				b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
+				b.option(ChannelOption.TCP_NODELAY, true);
+				b.option(ChannelOption.SO_KEEPALIVE, true);
+				/*
+				EOC
+				*/
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
+					System.out.println("Channel Monitor" + " " + ei.getChannel().toString());
 					if (ei.isActive() && ei.getChannel() != null) {
 						WorkMessage wm = createHB(ei);
 						ei.getChannel().writeAndFlush(wm);
@@ -96,7 +123,14 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 						// TODO create a client to the node
 						logger.info("trying to connect to node " + ei.getRef());
 						CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
-						ei.setChannel(commC.getChannel());
+						//BOC Pranav
+						channel = b.connect(ei.getHost(), ei.getPort()).syncUninterruptibly();
+						CommConnection.ClientClosedListener ccl = new CommConnection.ClientClosedListener(commC);
+						channel.channel().closeFuture().addListener(ccl);
+						//EOC Pranav
+
+						//ei.setChannel(commC.getChannel());
+						ei.setChannel(channel.channel());
 						ei.setActive(true);
 						logger.info("connected to node " + ei.getRef() + ei.isActive());
 					}

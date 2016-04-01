@@ -15,6 +15,14 @@
  */
 package gash.router.server.edges;
 
+import gash.router.server.CommandInit;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +35,8 @@ import pipe.work.Work.WorkState;
 
 import gash.router.client.CommConnection;
 
+import java.util.Collection;
+
 public class EdgeMonitor implements EdgeListener, Runnable {
 	protected static Logger logger = LoggerFactory.getLogger("edge monitor");
 
@@ -35,6 +45,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
+
+	//pranav
+	private EventLoopGroup group;
+	private ChannelFuture channelFuture;
 
 	public EdgeMonitor(ServerState state) {
 		if (state == null)
@@ -91,14 +105,16 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
 					if (ei.isActive() && ei.getChannel() != null) {
 						WorkMessage wm = createHB(ei);
+						logger.info("HeartBeat from: " + ei.getRef());
 						ei.getChannel().writeAndFlush(wm);
 					} else {
 						// TODO create a client to the node
+						Channel channel = channelInit(ei.getHost(),ei.getPort());
 						logger.info("trying to connect to node " + ei.getRef());
-						CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
-						ei.setChannel(commC.getChannel());
+						//CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
+						ei.setChannel(channel); //pranav
 						ei.setActive(true);
-						logger.info("connected to node " + ei.getRef() + ei.isActive());
+						logger.info("connected to node channel " + ei.getRef() + ei.isActive()+ei.getChannel());
 					}
 				}
 
@@ -108,6 +124,28 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public Channel channelInit(String host, int port)
+	{
+		try
+		{
+			group = new NioEventLoopGroup();
+			CommandInit si = new CommandInit(null, false);
+			Bootstrap b = new Bootstrap();
+			b.group(group).channel(NioSocketChannel.class).handler(si);
+			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
+			b.option(ChannelOption.TCP_NODELAY, true);
+			b.option(ChannelOption.SO_KEEPALIVE, true);
+
+			// Make the connection attempt.
+			channelFuture = b.connect(host, port).syncUninterruptibly();
+		}
+		catch(Throwable ex)
+		{
+			logger.error("Error initializing channel: " + ex);
+		}
+		return channelFuture.channel();
 	}
 
 	@Override
@@ -133,5 +171,32 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			logger.info("Edge removed and disconnected from node " + ei.getRef() + ei.isActive());
 			ei = null; // making it available for garbage collection
 		}
+	}
+
+	public Collection<EdgeInfo> getOutboundEdgeInfoList(){
+		return outboundEdges.map.values();
+	}
+
+	/**
+	 * Author : Manthan
+	 * */
+	public void updateState(ServerState newState){
+		EdgeInfo newOutboundEdge = null;
+		this.state = newState;
+		this.state.setEmon(this);
+
+		if (state.getConf().getRouting() != null) {
+			for (RoutingEntry e : state.getConf().getRouting()) {
+				newOutboundEdge = outboundEdges.createIfNew(e.getId(), e.getHost(), e.getPort());
+				if(newOutboundEdge!= null)
+					onAdd(newOutboundEdge);
+			}
+		}
+
+		// cannot go below 2 sec
+		if (state.getConf().getHeartbeatDt() > this.dt)
+			this.dt = state.getConf().getHeartbeatDt();
+
+		newOutboundEdge = null;
 	}
 }

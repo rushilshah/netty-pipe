@@ -68,4 +68,19 @@ public class EdgeList {
 	public void clear() {
 		map.clear();
 	}
+
+	/**
+	 * Author : Manthan
+	 *
+	 **/
+	public EdgeInfo returnAndRemoveIfNotNew(int ref, String host, int port) {
+		if (hasNode(ref)) {
+			EdgeInfo ei = getNode(ref);
+			removeNode(ei.getRef());
+			return ei;
+		}
+		else {
+			return null;
+		}
+	}
 }

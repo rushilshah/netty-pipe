@@ -12,6 +12,8 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import routing.Pipe;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Initializes the external interface
  * @author gash
@@ -45,6 +47,7 @@ public class CommandInit extends ChannelInitializer<SocketChannel> {
 		 * 4 bytes
 		 */
 		pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(67108864, 0, 4, 0, 4));
+		//pipeline.addLast("ping", new IdleStateHandler(5, 5, 8, TimeUnit.SECONDS)); // Added by Pranav
 
 		// decoder must be first
 		pipeline.addLast("protobufDecoder", new ProtobufDecoder(Pipe.CommandRequest.getDefaultInstance()));

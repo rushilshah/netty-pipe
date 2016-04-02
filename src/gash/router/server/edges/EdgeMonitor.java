@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import gash.router.container.RoutingConf.RoutingEntry;
 import gash.router.server.ServerState;
 import pipe.common.Common.Header;
+import pipe.work.Work;
 import pipe.work.Work.Heartbeat;
-import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
 
 import gash.router.client.CommConnection;
@@ -69,7 +69,7 @@ public class EdgeMonitor implements EdgeListener, Runnable{
 		inboundEdges.createIfNew(ref, host, port);
 	}
 
-	private WorkMessage createHB(EdgeInfo ei) {
+	private Work.WorkRequest createHB(EdgeInfo ei) {
 		WorkState.Builder sb = WorkState.newBuilder();
 		sb.setEnqueued(-1);
 		sb.setProcessed(-1);
@@ -77,14 +77,17 @@ public class EdgeMonitor implements EdgeListener, Runnable{
 		Heartbeat.Builder bb = Heartbeat.newBuilder();
 		bb.setState(sb);
 
+		Work.Payload.Builder py= Work.Payload.newBuilder();
+		py.setBeat(bb);
+
 		Header.Builder hb = Header.newBuilder();
 		hb.setNodeId(state.getConf().getNodeId());
 		hb.setDestination(-1);
 		hb.setTime(System.currentTimeMillis());
 
-		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
 		wb.setHeader(hb);
-		wb.setBeat(bb);
+		wb.setPayload(py);
 		wb.setSecret(12345678);//added by Manthan
 		return wb.build();
 	}
@@ -99,7 +102,7 @@ public class EdgeMonitor implements EdgeListener, Runnable{
 			try {
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
 					if (ei.isActive() && ei.getChannel() != null) {
-						WorkMessage wm = createHB(ei);
+						Work.WorkRequest wm = createHB(ei);
 						ei.getChannel().writeAndFlush(wm);
 					} else {
 						// TODO create a client to the node // added by Manthan

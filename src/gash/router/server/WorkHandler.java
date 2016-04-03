@@ -15,6 +15,8 @@
  */
 package gash.router.server;
 
+import gash.router.server.election.ElectionManager;
+import gash.router.server.election.RaftManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +67,8 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		try {
 			if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
-				logger.debug("heartbeat from " + msg.getHeader().getNodeId());
+				ElectionManager.getInstance().assessCurrentState();
+				logger.info("heartbeat from " + msg.getHeader().getNodeId());
 			} else if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
 				System.out.println("ping from " + msg.getHeader().getNodeId() + " host: " + msg.getHeader().getSourceHost());
@@ -81,6 +84,11 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				Task t = msg.getTask();
 			} else if (msg.hasState()) {
 				WorkState s = msg.getState();
+			}
+			else if(msg.hasRaftmsg())
+			{
+				RaftManager.getInstance().processRequest(msg);
+				//ElectionManager.getInstance().assessCurrentState();
 			}
 		} catch (Exception e) {
 			// TODO add logging

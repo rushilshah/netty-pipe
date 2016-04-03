@@ -16,6 +16,7 @@
 package gash.router.server.edges;
 
 import gash.router.server.CommandInit;
+import gash.router.server.WorkInit;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -36,12 +37,14 @@ import pipe.work.Work.WorkState;
 import gash.router.client.CommConnection;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
 	protected static Logger logger = LoggerFactory.getLogger("edge monitor");
+	protected static AtomicReference<EdgeMonitor> instance = new AtomicReference<EdgeMonitor>(); // Pranav 4/2/2016
 
-	private EdgeList outboundEdges;
-	private EdgeList inboundEdges;
+	private static EdgeList outboundEdges;
+	private static EdgeList inboundEdges;
 	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
@@ -64,11 +67,21 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				outboundEdges.addNode(e.getId(), e.getHost(), e.getPort());
 			}
 		}
+		instance.compareAndSet(null,this); //4/2/2016
 
 		// cannot go below 2 sec
 		if (state.getConf().getHeartbeatDt() > this.dt)
 			this.dt = state.getConf().getHeartbeatDt();
 	}
+
+	/*BOC Pranav
+		4/0/2016
+		EdgeMonitor instance
+	 */
+	public static EdgeMonitor getInstance(){
+		return instance.get();
+	}
+	//EOC
 
 	public void createInboundIfNew(int ref, String host, int port) {
 		inboundEdges.createIfNew(ref, host, port);
@@ -105,7 +118,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
 					if (ei.isActive() && ei.getChannel() != null) {
 						WorkMessage wm = createHB(ei);
-						logger.info("HeartBeat from: " + ei.getRef());
+						logger.info("HeartBeat to: " + ei.getRef()); // Pranav
 						ei.getChannel().writeAndFlush(wm);
 					} else {
 						// TODO create a client to the node
@@ -126,14 +139,16 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		}
 	}
 
+
+	//Create Channels for edge heartbeat
 	public Channel channelInit(String host, int port)
 	{
 		try
 		{
 			group = new NioEventLoopGroup();
-			CommandInit si = new CommandInit(null, false);
+			WorkInit wi = new WorkInit(state, false);
 			Bootstrap b = new Bootstrap();
-			b.group(group).channel(NioSocketChannel.class).handler(si);
+			b.group(group).channel(NioSocketChannel.class).handler(wi);
 			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
 			b.option(ChannelOption.TCP_NODELAY, true);
 			b.option(ChannelOption.SO_KEEPALIVE, true);
@@ -164,7 +179,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	public synchronized void onRemove(EdgeInfo ei) {
 		// TODO ? //added by Manthan
 		if(ei.isActive() || ei.getChannel() != null){
-			logger.info("Edge removed, trying to disconnect to node " + ei.getRef());		
+			logger.info("Edge removed, trying to disconnect to node " + ei.getRef());
 			ei.getChannel().close();
 			ei.setActive(false);
 			outboundEdges.removeNode(ei.getRef());
@@ -181,36 +196,16 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	 * Author : Manthan
 	 * */
 	public void updateState(ServerState newState){
-		//logger.info("Update State started.....");
 		EdgeInfo newOutboundEdge = null;
 		this.state = newState;
 		this.state.setEmon(this);
 
 		if (state.getConf().getRouting() != null) {
-
-			EdgeList newOutBoundEdges = new EdgeList();
 			for (RoutingEntry e : state.getConf().getRouting()) {
-
-
-				newOutboundEdge = outboundEdges.returnAndRemoveIfNotNew(e.getId(), e.getHost(), e.getPort());
-				if(newOutboundEdge != null){
-					//Edge already exists. Simply add it to new Map
-					newOutBoundEdges.map.put(newOutboundEdge.getRef(),newOutboundEdge);
-				}
-				else{
-					//edge is new and doen't exist
-					newOutboundEdge = newOutBoundEdges.addNode(e.getId(), e.getHost(), e.getPort());
-					if(newOutboundEdge!= null)
-						onAdd(newOutboundEdge);
-				}
+				newOutboundEdge = outboundEdges.createIfNew(e.getId(), e.getHost(), e.getPort());
+				if(newOutboundEdge!= null)
+					onAdd(newOutboundEdge);
 			}
-			for(EdgeInfo ei : outboundEdges.map.values()){
-				onRemove(ei);
-			}
-			outboundEdges.clear();
-			outboundEdges = null; // for garbage collection
-			outboundEdges = newOutBoundEdges;
-
 		}
 
 		// cannot go below 2 sec
@@ -218,6 +213,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			this.dt = state.getConf().getHeartbeatDt();
 
 		newOutboundEdge = null;
-		//logger.info("Update State done.....");
+	}
+
+	public static Channel getConnection(Integer host)
+	{
+		return outboundEdges.getNode(host).getChannel();
 	}
 }

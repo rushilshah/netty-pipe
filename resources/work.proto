@@ -44,5 +44,8 @@ message WorkMessage {
       Task task = 6;
       WorkState state = 7;
       LeaderStatus leader = 8;
+      RaftMessage raftmsg = 9;
+      LeaderElection election = 10;
    }
 }
+

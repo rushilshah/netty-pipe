@@ -20,6 +20,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pipe.work.Work;
 
 public class WorkOutboundAppWorker extends Thread {
 	protected static Logger logger = LoggerFactory.getLogger("server");
@@ -56,7 +57,7 @@ public class WorkOutboundAppWorker extends Thread {
 					boolean rtn = false;
 					if (sq.channel != null && sq.channel.isOpen() && sq.channel.isWritable()) {
 						
-						ChannelFuture cf = sq.channel.writeAndFlush(msg);
+						ChannelFuture cf = sq.channel.writeAndFlush((Work.WorkRequest)msg);
 
 						logger.info("Server--sending -- work-- response");
 						// blocks on write - use listener to be async

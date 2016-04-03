@@ -88,7 +88,7 @@ public class CommandInboundAppWorker extends Thread {
 										hb.setDestinationHost(req.getHeader().getDestinationHost());
 										hb.setMaxHops(5);
 
-										wb.setHeader(req.getHeader());
+										wb.setHeader(hb);
 										wb.setSecret(1234567809);
 										wb.setPayload(Work.Payload.newBuilder().setPing(true));
 

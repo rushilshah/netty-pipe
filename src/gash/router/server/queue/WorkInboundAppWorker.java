@@ -70,7 +70,7 @@ public class WorkInboundAppWorker extends Thread {
 					//PrintUtil.printWork(req);
 					if (payload.hasBeat()) {
 						//Work.Heartbeat hb = payload.getBeat();
-						logger.debug("heartbeat from " + req.getHeader().getNodeId());
+						logger.info("heartbeat from " + req.getHeader().getNodeId());
 					} else if (payload.hasPing()) {
 						logger.info("ping from <node,host> : <" + req.getHeader().getNodeId() + ", " + req.getHeader().getSourceHost()+">");
 						PrintUtil.printWork(req);

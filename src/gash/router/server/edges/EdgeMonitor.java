@@ -16,6 +16,7 @@
 package gash.router.server.edges;
 
 import gash.router.server.CommandInit;
+import gash.router.server.WorkInit;
 import gash.router.server.queue.QueueFactory;
 
 import gash.router.server.listener.EdgeDisconnectionListener;
@@ -144,7 +145,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		try
 		{
 			group = new NioEventLoopGroup();
-			CommandInit si = new CommandInit(null, false);
+			WorkInit si = new WorkInit(state, false);
 			Bootstrap b = new Bootstrap();
 			b.group(group).channel(NioSocketChannel.class).handler(si);
 			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);

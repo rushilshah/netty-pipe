@@ -29,29 +29,29 @@ public class CommandOutboundAppWorker extends Thread {
 	boolean forever = true;
 
 	public CommandOutboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelCommandQueue sq) {
-		super(tgrp, "outbound-" + workerId);
+		super(tgrp, "outboundWork-" + workerId);
 		this.workerId = workerId;
 		this.sq = sq;
 
-		if (sq.outbound == null)
-			throw new RuntimeException("connection worker detected no outbound queue");
+		if (sq.outboundWork == null)
+			throw new RuntimeException("connection worker detected no outboundWork queue");
 	}
 
 	@Override
 	public void run() {
 		Channel conn = sq.channel;
 		if (conn == null || !conn.isOpen()) {
-			PerChannelWorkQueue.logger.error("connection missing, no outbound communication");
+			PerChannelWorkQueue.logger.error("connection missing, no outboundWork communication");
 			return;
 		}
 
 		while (true) {
-			if (!forever && sq.outbound.size() == 0)
+			if (!forever && sq.outboundWork.size() == 0)
 				break;
 
 			try {
 				// block until a message is enqueued
-				GeneratedMessage msg = sq.outbound.take();
+				GeneratedMessage msg = sq.outboundWork.take();
 				if (conn.isWritable()) {
 					boolean rtn = false;
 					if (sq.channel != null && sq.channel.isOpen() && sq.channel.isWritable()) {
@@ -68,14 +68,14 @@ public class CommandOutboundAppWorker extends Thread {
 						if (!rtn) {
 							System.out.println("Sending failed " + rtn
 									+ "{Reason:" + cf.cause() + "}");
-							sq.outbound.putFirst(msg);
+							sq.outboundWork.putFirst(msg);
 						}
 						else
 							System.out.println("Message Send");
 					}
 
 				} else
-					sq.outbound.putFirst(msg);
+					sq.outboundWork.putFirst(msg);
 			} catch (InterruptedException ie) {
 				break;
 			} catch (Exception e) {

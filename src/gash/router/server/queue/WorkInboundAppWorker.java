@@ -34,19 +34,19 @@ public class WorkInboundAppWorker extends Thread {
 	boolean forever = true;
 
 	public WorkInboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelWorkQueue sq) {
-		super(tgrp, "inbound-" + workerId);
+		super(tgrp, "inboundWork-" + workerId);
 		this.workerId = workerId;
 		this.sq = sq;
 
 		if (sq.inbound == null)
-			throw new RuntimeException("connection worker detected null inbound queue");
+			throw new RuntimeException("connection worker detected null inboundWork queue");
 	}
 
 	@Override
 	public void run() {
 		Channel conn = sq.getChannel();
 		if (conn == null || !conn.isOpen()) {
-			logger.error("connection missing, no inbound communication");
+			logger.error("connection missing, no inboundWork communication");
 			return;
 		}
 
@@ -72,11 +72,7 @@ public class WorkInboundAppWorker extends Thread {
 					} else if (payload.hasPing()) {
 						logger.info("ping from " + req.getHeader().getNodeId());
 						System.out.println("ping from " + req.getHeader().getNodeId() + " host: " + req.getHeader().getSourceHost());
-						boolean p = payload.getPing();
-						Work.WorkRequest.Builder rb = Work.WorkRequest.newBuilder();
-						rb.setHeader(req.getHeader());
-						rb.setPayload(Work.Payload.newBuilder().setPing(true));
-						sq.enqueueResponse(rb.build(),conn);
+
 					} else if (payload.hasErr()) {
 						Common.Failure err = payload.getErr();
 						logger.error("failure from " + req.getHeader().getNodeId());

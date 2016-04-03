@@ -17,12 +17,10 @@ package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
 import gash.router.server.MessageServer;
-import gash.router.server.PrintUtil;
 import gash.router.server.edges.EdgeInfo;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pipe.common.Common;
 import pipe.work.Work;
 import routing.Pipe;
 
@@ -34,34 +32,35 @@ public class CommandInboundAppWorker extends Thread {
 	boolean forever = true;
 
 	public CommandInboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelCommandQueue sq) {
-		super(tgrp, "inbound-" + workerId);
+		super(tgrp, "inboundWork-" + workerId);
 		this.workerId = workerId;
 		this.sq = sq;
 
-		if (sq.inbound == null)
-			throw new RuntimeException("connection worker detected null inbound queue");
+		if (sq.inboundWork == null)
+			throw new RuntimeException("connection worker detected null inboundWork queue");
 	}
 
 	@Override
 	public void run() {
 		Channel conn = sq.getChannel();
 		if (conn == null || !conn.isOpen()) {
-			logger.error("connection missing, no inbound communication");
+			logger.error("connection missing, no inboundWork communication");
 			return;
 		}
 
 		while (true) {
-			if (!forever && sq.inbound.size() == 0)
+			if (!forever && sq.inboundWork.size() == 0)
 				break;
 
 			try {
 				// block until a message is enqueued
-				GeneratedMessage msg = sq.inbound.take();
+				GeneratedMessage msg = sq.inboundWork.take();
 
 				// process request and enqueue response
 				if(msg instanceof Pipe.CommandRequest){
 
 					//PrintUtil.printCommand((Pipe.CommandRequest) msg);
+					boolean msgDropFlag;
 
 					Pipe.CommandRequest req = ((Pipe.CommandRequest) msg);
 					Pipe.Payload payload = req.getPayload();
@@ -72,17 +71,23 @@ public class CommandInboundAppWorker extends Thread {
 							System.out.println("Message for me: "+ payload.getMessage() + " from "+ req.getHeader().getSourceHost());
 						}
 						else{ //message doesn't belong to current node. Forward on other edges
+							msgDropFlag = true;
 							if(MessageServer.getEmon() != null){// forward if Comm-worker port is active
 								for(EdgeInfo ei :MessageServer.getEmon().getOutboundEdgeInfoList()){
-									if(ei.isActive() && ei.getChannel() != null){// check if channel of outbound edge is active
+									if(ei.isActive() && ei.getChannel() != null){// check if channel of outboundWork edge is active
 										Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
 										wb.setHeader(req.getHeader());
 										wb.setSecret(1234567809);
 										wb.setPayload(Work.Payload.newBuilder().setPing(true));
 										Work.WorkRequest work = wb.build();
-										sq.enqueueResponse(work,conn);
+										msgDropFlag = false;
+										PerChannelWorkQueue edgeQueue = (PerChannelWorkQueue) ei.getQueue();
+										edgeQueue.enqueueResponse(work,ei.getChannel());
+										logger.info("Workmessage sent");
 									}
 								}
+								if(msgDropFlag)
+									logger.info("Message dropped <node,message>: <" + req.getHeader().getNodeId()+"," + payload.getMessage()+">");
 							}
 							else{// drop the message or queue it for limited time to send to connected node
 								//todo

@@ -41,14 +41,15 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class PerChannelCommandQueue implements ChannelQueue {
 	protected static Logger logger = LoggerFactory.getLogger("server");
 
-	// The queues feed work to the inbound and outbound threads (workers). The
+	// The queues feed work to the inboundWork and outboundWork threads (workers). The
 	// threads perform a blocking 'get' on the queue until a new event/task is
 	// enqueued. This design prevents a wasteful 'spin-lock' design for the
 	// threads
 	//
 	// Note these are directly accessible by the workers
-	LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> inbound;
-	LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> outbound;
+	LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> inboundWork;
+	LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> outboundWork;
+
 	Channel channel;
 	RoutingConf conf;
 
@@ -66,8 +67,8 @@ public class PerChannelCommandQueue implements ChannelQueue {
 	}
 
 	protected void init() {
-		inbound = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
-		outbound = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
+		inboundWork = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
+		outboundWork = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
 
 		logger.info("Starting to listen to Command worker");
 		iworker = new CommandInboundAppWorker(tgroup, 1, this);
@@ -89,6 +90,14 @@ public class PerChannelCommandQueue implements ChannelQueue {
 		return conf;
 	}
 
+	public void setState(ServerState state) {
+		//Nothing to do with this class
+	}
+
+	@Override
+	public void setRouteConfig(RoutingConf config) {
+		this.conf = config;
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -102,8 +111,8 @@ public class PerChannelCommandQueue implements ChannelQueue {
 
 		if (hard) {
 			// drain queues, don't allow graceful completion
-			inbound.clear();
-			outbound.clear();
+			inboundWork.clear();
+			outboundWork.clear();
 		}
 
 		if (iworker != null) {
@@ -130,7 +139,7 @@ public class PerChannelCommandQueue implements ChannelQueue {
 	@Override
 	public void enqueueRequest(GeneratedMessage req, Channel notused) {
 		try {
-			inbound.put(req);
+			inboundWork.put(req);
 		} catch (InterruptedException e) {
 			logger.error("message not enqueued for processing", e);
 		}
@@ -147,7 +156,7 @@ public class PerChannelCommandQueue implements ChannelQueue {
 			return;
 
 		try {
-			outbound.put(reply);
+			outboundWork.put(reply);
 		} catch (InterruptedException e) {
 			logger.error("message not enqueued for reply", e);
 		}
@@ -166,11 +175,11 @@ public class PerChannelCommandQueue implements ChannelQueue {
 		}
 	}
 
-	public LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> getInbound() {
-		return inbound;
+	public LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> getInboundWork() {
+		return inboundWork;
 	}
 
-	public LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> getOutbound() {
-		return outbound;
+	public LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> getOutboundWork() {
+		return outboundWork;
 	}
 }

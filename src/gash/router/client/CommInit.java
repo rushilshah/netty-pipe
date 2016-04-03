@@ -9,6 +9,7 @@ import io.netty.handler.codec.compression.ZlibCodecFactory;
 import io.netty.handler.codec.compression.ZlibWrapper;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import pipe.work.Work;
 import routing.Pipe;
 
 public class CommInit extends ChannelInitializer<SocketChannel> {

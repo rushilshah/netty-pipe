@@ -29,19 +29,19 @@ public class WorkOutboundAppWorker extends Thread {
 	boolean forever = true;
 
 	public WorkOutboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelWorkQueue sq) {
-		super(tgrp, "outbound-" + workerId);
+		super(tgrp, "outboundWork-" + workerId);
 		this.workerId = workerId;
 		this.sq = sq;
 
 		if (sq.outbound == null)
-			throw new RuntimeException("connection worker detected no outbound queue");
+			throw new RuntimeException("connection worker detected no outboundWork queue");
 	}
 
 	@Override
 	public void run() {
 		Channel conn = sq.channel;
 		if (conn == null || !conn.isOpen()) {
-			PerChannelWorkQueue.logger.error("connection missing, no outbound communication");
+			PerChannelWorkQueue.logger.error("connection missing, no outboundWork communication");
 			return;
 		}
 

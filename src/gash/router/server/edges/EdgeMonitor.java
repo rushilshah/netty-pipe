@@ -16,6 +16,7 @@
 package gash.router.server.edges;
 
 import gash.router.server.CommandInit;
+import gash.router.server.queue.QueueFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -94,6 +95,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		wb.setHeader(hb);
 		wb.setPayload(py);
 		wb.setSecret(12345678);//added by Manthan
+
 		return wb.build();
 	}
 
@@ -107,7 +109,9 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			try {
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
 					if (ei.isActive() && ei.getChannel() != null) {
+
 						Work.WorkRequest wm = createHB(ei);
+						logger.info("HeartBeat from: " + ei.getRef());
 						ei.getChannel().writeAndFlush(wm);
 					} else {
 						// TODO create a client to the node
@@ -115,6 +119,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 						logger.info("trying to connect to node " + ei.getRef());
 						//CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
 						ei.setChannel(channel); //pranav
+						ei.setQueue(QueueFactory.getInstance(channel,state));
 						ei.setActive(true);
 						logger.info("connected to node channel " + ei.getRef() + ei.isActive()+ei.getChannel());
 					}
@@ -157,14 +162,12 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			logger.info("New edge added, trying to connect to node " + ei.getRef());
 			CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
 			ei.setChannel(commC.getChannel());
+			ei.setQueue(QueueFactory.getInstance(commC.getChannel(),state));
 			ei.setActive(true);
 			logger.info("New edge added and connected to node " + ei.getRef() + ei.isActive());
 		}
 	}
 
-	/**
-	 * Author : Manthan
-	 * */
 	@Override
 	public synchronized void onRemove(EdgeInfo ei) {
 		// TODO ? //added by Manthan
@@ -172,15 +175,13 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			logger.info("Edge removed, trying to disconnect to node " + ei.getRef());		
 			ei.getChannel().close();
 			ei.setActive(false);
+			ei.getQueue().shutdown(false);
 			outboundEdges.removeNode(ei.getRef());
 			logger.info("Edge removed and disconnected from node " + ei.getRef() + ei.isActive());
 			ei = null; // making it available for garbage collection
 		}
 	}
 
-	/**
-	 * Author : Manthan
-	 * */
 	public Collection<EdgeInfo> getOutboundEdgeInfoList(){
 		return outboundEdges.map.values();
 	}
@@ -204,6 +205,8 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				if(newOutboundEdge != null){
 					//Edge already exists. Simply add it to new Map
 					newOutBoundEdges.map.put(newOutboundEdge.getRef(),newOutboundEdge);
+					if(null != newOutboundEdge.getQueue())
+						newOutboundEdge.getQueue().setState(state);
 				}
 				else{
 					//edge is new and doen't exist
@@ -212,6 +215,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 						onAdd(newOutboundEdge);
 				}
 			}
+			//TODO: Inactive edge so that whenerver edge comes up back it can serve previous queue request
 			for(EdgeInfo ei : outboundEdges.map.values()){
 				onRemove(ei);
 			}

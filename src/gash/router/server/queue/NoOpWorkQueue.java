@@ -17,6 +17,8 @@ package gash.router.server.queue;
  */
 
 import com.google.protobuf.GeneratedMessage;
+import gash.router.container.RoutingConf;
+import gash.router.server.ServerState;
 import org.slf4j.LoggerFactory;
 
 import io.netty.channel.Channel;
@@ -52,6 +54,16 @@ public class NoOpWorkQueue implements ChannelQueue {
     @Override
     public void enqueueResponse(GeneratedMessage reply, Channel notused) {
         logger.info(queueName + ": response received");
+    }
+
+    @Override
+    public void setState(ServerState state) {
+        //not to be implemented
+    }
+
+    @Override
+    public void setRouteConfig(RoutingConf config) {
+        //not to be implemented
     }
 
 }

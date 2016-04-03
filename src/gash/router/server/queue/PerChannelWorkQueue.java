@@ -16,6 +16,7 @@
 package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
+import gash.router.container.RoutingConf;
 import gash.router.server.ServerState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -40,7 +41,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class PerChannelWorkQueue implements ChannelQueue {
 	protected static Logger logger = LoggerFactory.getLogger("server");
 
-	// The queues feed work to the inbound and outbound threads (workers). The
+	// The queues feed work to the inboundWork and outboundWork threads (workers). The
 	// threads perform a blocking 'get' on the queue until a new event/task is
 	// enqueued. This design prevents a wasteful 'spin-lock' design for the
 	// threads
@@ -88,11 +89,20 @@ public class PerChannelWorkQueue implements ChannelQueue {
 		return state;
 	}
 
+	public void setState(ServerState state) {
+		this.state = state;
+	}
+
+	@Override
+	public void setRouteConfig(RoutingConf config) {
+		//Nothing to do with this class
+	}
+
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see poke.server.ChannelQueue#shutdown(boolean)
-	 */
+             * (non-Javadoc)
+             *
+             * @see poke.server.ChannelQueue#shutdown(boolean)
+             */
 	@Override
 	public void shutdown(boolean hard) {
 		logger.info("server is shutting down");

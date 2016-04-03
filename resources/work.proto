@@ -33,6 +33,8 @@ message Payload{
     optional Task task = 6;
     optional WorkState state = 7;
     optional LeaderStatus leader = 8;
+    optional Request request = 16;
+
 }
 
 // These are messages to keep the network running (not to perform work)

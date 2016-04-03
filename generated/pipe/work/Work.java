@@ -1621,6 +1621,19 @@ public final class Work {
      * <code>optional .LeaderStatus leader = 8;</code>
      */
     pipe.election.Election.LeaderStatusOrBuilder getLeaderOrBuilder();
+
+    /**
+     * <code>optional .Request request = 16;</code>
+     */
+    boolean hasRequest();
+    /**
+     * <code>optional .Request request = 16;</code>
+     */
+    pipe.common.Common.Request getRequest();
+    /**
+     * <code>optional .Request request = 16;</code>
+     */
+    pipe.common.Common.RequestOrBuilder getRequestOrBuilder();
   }
   /**
    * Protobuf type {@code Payload}
@@ -1742,6 +1755,19 @@ public final class Work {
                 leader_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000020;
+              break;
+            }
+            case 130: {
+              pipe.common.Common.Request.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000040) == 0x00000040)) {
+                subBuilder = request_.toBuilder();
+              }
+              request_ = input.readMessage(pipe.common.Common.Request.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(request_);
+                request_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000040;
               break;
             }
           }
@@ -1924,6 +1950,27 @@ public final class Work {
       return leader_;
     }
 
+    public static final int REQUEST_FIELD_NUMBER = 16;
+    private pipe.common.Common.Request request_;
+    /**
+     * <code>optional .Request request = 16;</code>
+     */
+    public boolean hasRequest() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional .Request request = 16;</code>
+     */
+    public pipe.common.Common.Request getRequest() {
+      return request_;
+    }
+    /**
+     * <code>optional .Request request = 16;</code>
+     */
+    public pipe.common.Common.RequestOrBuilder getRequestOrBuilder() {
+      return request_;
+    }
+
     private void initFields() {
       err_ = pipe.common.Common.Failure.getDefaultInstance();
       ping_ = false;
@@ -1931,6 +1978,7 @@ public final class Work {
       task_ = pipe.work.Work.Task.getDefaultInstance();
       state_ = pipe.work.Work.WorkState.getDefaultInstance();
       leader_ = pipe.election.Election.LeaderStatus.getDefaultInstance();
+      request_ = pipe.common.Common.Request.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1968,6 +2016,12 @@ public final class Work {
           return false;
         }
       }
+      if (hasRequest()) {
+        if (!getRequest().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -1992,6 +2046,9 @@ public final class Work {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeMessage(8, leader_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeMessage(16, request_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2025,6 +2082,10 @@ public final class Work {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, leader_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(16, request_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2140,6 +2201,7 @@ public final class Work {
           getTaskFieldBuilder();
           getStateFieldBuilder();
           getLeaderFieldBuilder();
+          getRequestFieldBuilder();
         }
       }
       private static Builder create() {
@@ -2180,6 +2242,12 @@ public final class Work {
           leaderBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000020);
+        if (requestBuilder_ == null) {
+          request_ = pipe.common.Common.Request.getDefaultInstance();
+        } else {
+          requestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -2252,6 +2320,14 @@ public final class Work {
         } else {
           result.leader_ = leaderBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        if (requestBuilder_ == null) {
+          result.request_ = request_;
+        } else {
+          result.request_ = requestBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2286,6 +2362,9 @@ public final class Work {
         if (other.hasLeader()) {
           mergeLeader(other.getLeader());
         }
+        if (other.hasRequest()) {
+          mergeRequest(other.getRequest());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -2317,6 +2396,12 @@ public final class Work {
         }
         if (hasLeader()) {
           if (!getLeader().isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (hasRequest()) {
+          if (!getRequest().isInitialized()) {
             
             return false;
           }
@@ -3005,6 +3090,122 @@ public final class Work {
           leader_ = null;
         }
         return leaderBuilder_;
+      }
+
+      private pipe.common.Common.Request request_ = pipe.common.Common.Request.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder> requestBuilder_;
+      /**
+       * <code>optional .Request request = 16;</code>
+       */
+      public boolean hasRequest() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional .Request request = 16;</code>
+       */
+      public pipe.common.Common.Request getRequest() {
+        if (requestBuilder_ == null) {
+          return request_;
+        } else {
+          return requestBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .Request request = 16;</code>
+       */
+      public Builder setRequest(pipe.common.Common.Request value) {
+        if (requestBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          request_ = value;
+          onChanged();
+        } else {
+          requestBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000040;
+        return this;
+      }
+      /**
+       * <code>optional .Request request = 16;</code>
+       */
+      public Builder setRequest(
+          pipe.common.Common.Request.Builder builderForValue) {
+        if (requestBuilder_ == null) {
+          request_ = builderForValue.build();
+          onChanged();
+        } else {
+          requestBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000040;
+        return this;
+      }
+      /**
+       * <code>optional .Request request = 16;</code>
+       */
+      public Builder mergeRequest(pipe.common.Common.Request value) {
+        if (requestBuilder_ == null) {
+          if (((bitField0_ & 0x00000040) == 0x00000040) &&
+              request_ != pipe.common.Common.Request.getDefaultInstance()) {
+            request_ =
+              pipe.common.Common.Request.newBuilder(request_).mergeFrom(value).buildPartial();
+          } else {
+            request_ = value;
+          }
+          onChanged();
+        } else {
+          requestBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000040;
+        return this;
+      }
+      /**
+       * <code>optional .Request request = 16;</code>
+       */
+      public Builder clearRequest() {
+        if (requestBuilder_ == null) {
+          request_ = pipe.common.Common.Request.getDefaultInstance();
+          onChanged();
+        } else {
+          requestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000040);
+        return this;
+      }
+      /**
+       * <code>optional .Request request = 16;</code>
+       */
+      public pipe.common.Common.Request.Builder getRequestBuilder() {
+        bitField0_ |= 0x00000040;
+        onChanged();
+        return getRequestFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .Request request = 16;</code>
+       */
+      public pipe.common.Common.RequestOrBuilder getRequestOrBuilder() {
+        if (requestBuilder_ != null) {
+          return requestBuilder_.getMessageOrBuilder();
+        } else {
+          return request_;
+        }
+      }
+      /**
+       * <code>optional .Request request = 16;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder> 
+          getRequestFieldBuilder() {
+        if (requestBuilder_ == null) {
+          requestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder>(
+                  getRequest(),
+                  getParentForChildren(),
+                  isClean());
+          request_ = null;
+        }
+        return requestBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:Payload)
@@ -3871,13 +4072,14 @@ public final class Work {
       "to\"0\n\tWorkState\022\020\n\010enqueued\030\001 \002(\005\022\021\n\tpro" +
       "cessed\030\002 \002(\005\"&\n\tHeartbeat\022\031\n\005state\030\001 \002(\013" +
       "2\n.WorkState\")\n\004Task\022\021\n\tseries_id\030\001 \002(\003\022" +
-      "\016\n\006seq_id\030\002 \002(\005\"\227\001\n\007Payload\022\025\n\003err\030\003 \001(\013" +
+      "\016\n\006seq_id\030\002 \002(\005\"\262\001\n\007Payload\022\025\n\003err\030\003 \001(\013" +
       "2\010.Failure\022\014\n\004ping\030\004 \001(\010\022\030\n\004beat\030\005 \001(\0132\n" +
       ".Heartbeat\022\023\n\004task\030\006 \001(\0132\005.Task\022\031\n\005state" +
       "\030\007 \001(\0132\n.WorkState\022\035\n\006leader\030\010 \001(\0132\r.Lea" +
-      "derStatus\"Q\n\013WorkRequest\022\027\n\006header\030\001 \002(\013" +
-      "2\007.Header\022\016\n\006secret\030\002 \001(\003\022\031\n\007payload\030\003 \002",
-      "(\0132\010.PayloadB\r\n\tpipe.workH\001"
+      "derStatus\022\031\n\007request\030\020 \001(\0132\010.Request\"Q\n\013" +
+      "WorkRequest\022\027\n\006header\030\001 \002(\0132\007.Header\022\016\n\006",
+      "secret\030\002 \001(\003\022\031\n\007payload\030\003 \002(\0132\010.PayloadB" +
+      "\r\n\tpipe.workH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3916,7 +4118,7 @@ public final class Work {
     internal_static_Payload_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Payload_descriptor,
-        new java.lang.String[] { "Err", "Ping", "Beat", "Task", "State", "Leader", });
+        new java.lang.String[] { "Err", "Ping", "Beat", "Task", "State", "Leader", "Request", });
     internal_static_WorkRequest_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_WorkRequest_fieldAccessorTable = new

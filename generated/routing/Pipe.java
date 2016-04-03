@@ -47,6 +47,19 @@ public final class Pipe {
      * <code>optional .Failure err = 3;</code>
      */
     pipe.common.Common.FailureOrBuilder getErrOrBuilder();
+
+    /**
+     * <code>optional .Request request = 4;</code>
+     */
+    boolean hasRequest();
+    /**
+     * <code>optional .Request request = 4;</code>
+     */
+    pipe.common.Common.Request getRequest();
+    /**
+     * <code>optional .Request request = 4;</code>
+     */
+    pipe.common.Common.RequestOrBuilder getRequestOrBuilder();
   }
   /**
    * Protobuf type {@code Payload}
@@ -122,6 +135,19 @@ public final class Pipe {
                 err_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000004;
+              break;
+            }
+            case 34: {
+              pipe.common.Common.Request.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000008) == 0x00000008)) {
+                subBuilder = request_.toBuilder();
+              }
+              request_ = input.readMessage(pipe.common.Common.Request.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(request_);
+                request_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000008;
               break;
             }
           }
@@ -242,10 +268,32 @@ public final class Pipe {
       return err_;
     }
 
+    public static final int REQUEST_FIELD_NUMBER = 4;
+    private pipe.common.Common.Request request_;
+    /**
+     * <code>optional .Request request = 4;</code>
+     */
+    public boolean hasRequest() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional .Request request = 4;</code>
+     */
+    public pipe.common.Common.Request getRequest() {
+      return request_;
+    }
+    /**
+     * <code>optional .Request request = 4;</code>
+     */
+    public pipe.common.Common.RequestOrBuilder getRequestOrBuilder() {
+      return request_;
+    }
+
     private void initFields() {
       ping_ = false;
       message_ = "";
       err_ = pipe.common.Common.Failure.getDefaultInstance();
+      request_ = pipe.common.Common.Request.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -255,6 +303,12 @@ public final class Pipe {
 
       if (hasErr()) {
         if (!getErr().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      if (hasRequest()) {
+        if (!getRequest().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -274,6 +328,9 @@ public final class Pipe {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeMessage(3, err_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeMessage(4, request_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -295,6 +352,10 @@ public final class Pipe {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, err_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, request_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -406,6 +467,7 @@ public final class Pipe {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getErrFieldBuilder();
+          getRequestFieldBuilder();
         }
       }
       private static Builder create() {
@@ -424,6 +486,12 @@ public final class Pipe {
           errBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000004);
+        if (requestBuilder_ == null) {
+          request_ = pipe.common.Common.Request.getDefaultInstance();
+        } else {
+          requestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -468,6 +536,14 @@ public final class Pipe {
         } else {
           result.err_ = errBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        if (requestBuilder_ == null) {
+          result.request_ = request_;
+        } else {
+          result.request_ = requestBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -495,6 +571,9 @@ public final class Pipe {
         if (other.hasErr()) {
           mergeErr(other.getErr());
         }
+        if (other.hasRequest()) {
+          mergeRequest(other.getRequest());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -502,6 +581,12 @@ public final class Pipe {
       public final boolean isInitialized() {
         if (hasErr()) {
           if (!getErr().isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (hasRequest()) {
+          if (!getRequest().isInitialized()) {
             
             return false;
           }
@@ -750,6 +835,122 @@ public final class Pipe {
           err_ = null;
         }
         return errBuilder_;
+      }
+
+      private pipe.common.Common.Request request_ = pipe.common.Common.Request.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder> requestBuilder_;
+      /**
+       * <code>optional .Request request = 4;</code>
+       */
+      public boolean hasRequest() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional .Request request = 4;</code>
+       */
+      public pipe.common.Common.Request getRequest() {
+        if (requestBuilder_ == null) {
+          return request_;
+        } else {
+          return requestBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .Request request = 4;</code>
+       */
+      public Builder setRequest(pipe.common.Common.Request value) {
+        if (requestBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          request_ = value;
+          onChanged();
+        } else {
+          requestBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .Request request = 4;</code>
+       */
+      public Builder setRequest(
+          pipe.common.Common.Request.Builder builderForValue) {
+        if (requestBuilder_ == null) {
+          request_ = builderForValue.build();
+          onChanged();
+        } else {
+          requestBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .Request request = 4;</code>
+       */
+      public Builder mergeRequest(pipe.common.Common.Request value) {
+        if (requestBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) == 0x00000008) &&
+              request_ != pipe.common.Common.Request.getDefaultInstance()) {
+            request_ =
+              pipe.common.Common.Request.newBuilder(request_).mergeFrom(value).buildPartial();
+          } else {
+            request_ = value;
+          }
+          onChanged();
+        } else {
+          requestBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .Request request = 4;</code>
+       */
+      public Builder clearRequest() {
+        if (requestBuilder_ == null) {
+          request_ = pipe.common.Common.Request.getDefaultInstance();
+          onChanged();
+        } else {
+          requestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+      /**
+       * <code>optional .Request request = 4;</code>
+       */
+      public pipe.common.Common.Request.Builder getRequestBuilder() {
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return getRequestFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .Request request = 4;</code>
+       */
+      public pipe.common.Common.RequestOrBuilder getRequestOrBuilder() {
+        if (requestBuilder_ != null) {
+          return requestBuilder_.getMessageOrBuilder();
+        } else {
+          return request_;
+        }
+      }
+      /**
+       * <code>optional .Request request = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder> 
+          getRequestFieldBuilder() {
+        if (requestBuilder_ == null) {
+          requestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder>(
+                  getRequest(),
+                  getParentForChildren(),
+                  isClean());
+          request_ = null;
+        }
+        return requestBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:Payload)
@@ -1511,11 +1712,12 @@ public final class Pipe {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\npipe.proto\032\014common.proto\"?\n\007Payload\022\014\n" +
+      "\n\npipe.proto\032\014common.proto\"Z\n\007Payload\022\014\n" +
       "\004ping\030\001 \001(\010\022\017\n\007message\030\002 \001(\t\022\025\n\003err\030\003 \001(" +
-      "\0132\010.Failure\"D\n\016CommandRequest\022\027\n\006header\030" +
-      "\001 \002(\0132\007.Header\022\031\n\007payload\030\002 \002(\0132\010.Payloa" +
-      "dB\013\n\007routingH\001"
+      "\0132\010.Failure\022\031\n\007request\030\004 \001(\0132\010.Request\"D" +
+      "\n\016CommandRequest\022\027\n\006header\030\001 \002(\0132\007.Heade" +
+      "r\022\031\n\007payload\030\002 \002(\0132\010.PayloadB\013\n\007routingH" +
+      "\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1535,7 +1737,7 @@ public final class Pipe {
     internal_static_Payload_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Payload_descriptor,
-        new java.lang.String[] { "Ping", "Message", "Err", });
+        new java.lang.String[] { "Ping", "Message", "Err", "Request", });
     internal_static_CommandRequest_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_CommandRequest_fieldAccessorTable = new

@@ -40,7 +40,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  * 
  */
 public class PerChannelWorkQueue implements ChannelQueue {
-	protected static Logger logger = LoggerFactory.getLogger("server");
+	protected static Logger logger = LoggerFactory.getLogger("PerChannelWorkQueue");
 
 	// The queues feed work to the inboundWork and outboundWork threads (workers). The
 	// threads perform a blocking 'get' on the queue until a new event/task is
@@ -94,11 +94,11 @@ public class PerChannelWorkQueue implements ChannelQueue {
 		// channel.getCloseFuture().addListener(new CloseListener(this));
 	}
 
-	protected Channel getChannel() {
+	public Channel getChannel() {
 		return channel;
 	}
 
-	protected ServerState gerServerState(){
+	public ServerState gerServerState(){
 		return state;
 	}
 

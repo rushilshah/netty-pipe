@@ -18,9 +18,11 @@ package gash.router.server.queue;
 import com.google.protobuf.GeneratedMessage;
 import gash.router.server.MessageServer;
 import gash.router.server.edges.EdgeInfo;
+import gash.router.server.resources.Ping;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pipe.common.Common;
 import pipe.work.Work;
 import routing.Pipe;
 
@@ -67,9 +69,8 @@ public class CommandInboundAppWorker extends Thread {
 
 					if (payload.hasPing()) {
 						logger.info("ping from " + req.getHeader().getNodeId());
-						if(req.getHeader().getDestinationHost().equals(Integer.toString( sq.getRoutingConf().getCommandPort()))){
-							//handle message by self
-							System.out.println("Message for me: "+ payload.getMessage() + " from "+ req.getHeader().getSourceHost());
+						if(req.getHeader().getDestination() == sq.getRoutingConf().getNodeId()){
+							new Ping(sq).handleCommand(req);
 						}
 						else{ //message doesn't belong to current node. Forward on other edges
 							msgDropFlag = true;
@@ -77,26 +78,41 @@ public class CommandInboundAppWorker extends Thread {
 								for(EdgeInfo ei :MessageServer.getEmon().getOutboundEdgeInfoList()){
 									if(ei.isActive() && ei.getChannel() != null){// check if channel of outboundWork edge is active
 										Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
+
+										Common.Header.Builder hb = Common.Header.newBuilder();
+										hb.setNodeId(sq.getRoutingConf().getNodeId());
+										hb.setTime(req.getHeader().getTime());
+										hb.setDestination(req.getHeader().getDestination());
+										hb.setSourceHost(sq.getRoutingConf().getNodeId()+"_"+req.getHeader().getSourceHost());
+										hb.setDestinationHost(req.getHeader().getDestinationHost());
+										hb.setMaxHops(5);
+
 										wb.setHeader(req.getHeader());
 										wb.setSecret(1234567809);
 										wb.setPayload(Work.Payload.newBuilder().setPing(true));
+
 										Work.WorkRequest work = wb.build();
-										msgDropFlag = false;
+
 										PerChannelWorkQueue edgeQueue = (PerChannelWorkQueue) ei.getQueue();
 										edgeQueue.enqueueResponse(work,ei.getChannel());
+										msgDropFlag = false;
 										logger.info("Workmessage sent");
 									}
 								}
 								if(msgDropFlag)
-									logger.info("Message dropped <node,message>: <" + req.getHeader().getNodeId()+"," + payload.getMessage()+">");
+									logger.info("Message dropped <node,ping,destination>: <" + req.getHeader().getNodeId()+"," + payload.getPing()+"," + req.getHeader().getDestination()+">");
 							}
 							else{// drop the message or queue it for limited time to send to connected node
 								//todo
+								logger.info("No outbound edges to forward. To be handled");
 							}
 
 						}
 					} else if (payload.hasMessage()) {
 						logger.info(payload.getMessage());
+					}
+					else{
+						//todo
 					}
 
 				}

@@ -39,7 +39,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  * 
  */
 public class PerChannelWorkQueue implements ChannelQueue {
-	protected static Logger logger = LoggerFactory.getLogger("server");
+	protected static Logger logger = LoggerFactory.getLogger("PerChannelWorkQueue");
 
 	// The queues feed work to the inboundWork and outboundWork threads (workers). The
 	// threads perform a blocking 'get' on the queue until a new event/task is
@@ -69,7 +69,7 @@ public class PerChannelWorkQueue implements ChannelQueue {
 		inbound = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
 		outbound = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
 
-		logger.info("Starting to listen to Command worker");
+		logger.info("Starting to listen to Work worker");
 		iworker = new WorkInboundAppWorker(tgroup, 1, this);
 		iworker.start();
 

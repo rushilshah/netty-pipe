@@ -21,6 +21,16 @@ import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import gash.router.server.edges.EdgeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import pipe.common.Common;
+
 import pipe.common.Common.Failure;
 import pipe.work.Work;
 
@@ -52,7 +62,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<Work.WorkRequest> {
 	public void handleMessage(Work.WorkRequest msg, Channel channel) {
 		if (msg == null) {
 			// TODO add logging
-			System.out.println("ERROR: Unexpected content - " + msg);
+			logger.error("ERROR: Unexpected content - " + msg);
 			return;
 		}
 

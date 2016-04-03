@@ -46,7 +46,8 @@ public class MessageClient {
 		hb.setNodeId(999);
 		hb.setTime(System.currentTimeMillis());
 		hb.setDestination(6);
-		hb.setSourceHost("192.168.252.1");
+
+		hb.setSourceHost("999");
 		hb.setDestinationHost("4668");
 		
 

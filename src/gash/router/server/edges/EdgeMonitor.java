@@ -17,11 +17,11 @@ package gash.router.server.edges;
 
 import gash.router.server.CommandInit;
 import gash.router.server.queue.QueueFactory;
+
+import gash.router.server.listener.EdgeDisconnectionListener;
+
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
@@ -111,17 +111,23 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					if (ei.isActive() && ei.getChannel() != null) {
 
 						Work.WorkRequest wm = createHB(ei);
-						logger.info("HeartBeat from: " + ei.getRef());
+						logger.debug("HeartBeat to: " + ei.getRef());
+
 						ei.getChannel().writeAndFlush(wm);
 					} else {
 						// TODO create a client to the node
-						Channel channel = channelInit(ei.getHost(),ei.getPort());
 						logger.info("trying to connect to node " + ei.getRef());
 						//CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
+						Channel channel = channelInit(ei.getHost(),ei.getPort());
+						if(channel == null){
+							logger.debug("New edge cannot be established to node " + ei.getRef());
+							continue;
+						}
 						ei.setChannel(channel); //pranav
 						ei.setQueue(QueueFactory.getInstance(channel,state));
 						ei.setActive(true);
-						logger.info("connected to node channel " + ei.getRef() + ei.isActive()+ei.getChannel());
+						channel.closeFuture().addListener(new EdgeDisconnectionListener(this,ei));
+						logger.info("connected to node <id,isChannelActive> " + "<" + ei.getRef()+"," + ei.isActive()+">");
 					}
 				}
 
@@ -151,6 +157,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		catch(Throwable ex)
 		{
 			logger.error("Error initializing channel: " + ex);
+			return null;
 		}
 		return channelFuture.channel();
 	}
@@ -160,11 +167,18 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		// TODO check connection //added by Manthan
 		if(!ei.isActive() || ei.getChannel() == null){
 			logger.info("New edge added, trying to connect to node " + ei.getRef());
-			CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
-			ei.setChannel(commC.getChannel());
-			ei.setQueue(QueueFactory.getInstance(commC.getChannel(),state));
+
+			//CommConnection commC = CommConnection.initConnection(ei.getHost(),ei.getPort());
+			Channel channel = channelInit(ei.getHost(),ei.getPort());
+			if(channel == null){
+				logger.debug("New edge cannot be established to node " + ei.getRef());
+				return;
+			}
+			ei.setChannel(channel);
+			ei.setQueue(QueueFactory.getInstance(channel,state));
 			ei.setActive(true);
-			logger.info("New edge added and connected to node " + ei.getRef() + ei.isActive());
+			channel.closeFuture().addListener(new EdgeDisconnectionListener(this,ei));
+			logger.info("New edge added and connected to node <id,isChannelActive> " + "<" + ei.getRef()+"," + ei.isActive()+">");
 		}
 	}
 

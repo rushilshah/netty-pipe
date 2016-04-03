@@ -39,7 +39,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  * 
  */
 public class PerChannelCommandQueue implements ChannelQueue {
-	protected static Logger logger = LoggerFactory.getLogger("server");
+	protected static Logger logger = LoggerFactory.getLogger("PerChannelCommandQueue");
 
 	// The queues feed work to the inboundWork and outboundWork threads (workers). The
 	// threads perform a blocking 'get' on the queue until a new event/task is

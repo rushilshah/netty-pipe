@@ -56,7 +56,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<Pipe.CommandRequ
 	public void handleMessage(Pipe.CommandRequest msg, Channel channel) {
 		if (msg == null) {
 			// TODO add logging
-			System.out.println("ERROR: Unexpected content - " + msg);
+			logger.error("ERROR: Unexpected content - " + msg);
 			return;
 		}
 

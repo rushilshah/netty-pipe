@@ -56,25 +56,4 @@ public class MongoConnector {
         }
         return dbCollection;
     }
-
-    public static void main(String args[]){
-        configProperty = new Properties();
-        inputStream = MongoConnector.class.getClassLoader().getResourceAsStream("mongo-config.properties");
-
-        if(inputStream == null){
-            logger.error("Unable to load mongo property file");
-        }
-        else {
-
-            try {
-                configProperty.load(inputStream);
-                System.out.println(configProperty.getProperty("host") + "\n"
-                        + Integer.parseInt(configProperty.getProperty("port"))+"\n"+configProperty.getProperty("dbName"));
-            } catch (UnknownHostException e) {
-                logger.error(e.getMessage());
-            } catch (IOException e) {
-                logger.error(e.getMessage());
-            }
-        }
-    }
 }

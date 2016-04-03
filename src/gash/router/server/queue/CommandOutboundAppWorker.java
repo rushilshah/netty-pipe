@@ -60,10 +60,10 @@ public class CommandOutboundAppWorker extends Thread {
 					
 						
 						
-						System.out.println("Server--sending -- response");
+						logger.info("Server--sending -- command -- response");
 						// blocks on write - use listener to be async
 						cf.awaitUninterruptibly();
-						System.out.println("Written to channel");
+						logger.debug("Written to channel");
 						rtn = cf.isSuccess();
 						if (!rtn) {
 							System.out.println("Sending failed " + rtn
@@ -71,7 +71,7 @@ public class CommandOutboundAppWorker extends Thread {
 							sq.outboundWork.putFirst(msg);
 						}
 						else
-							System.out.println("Message Send");
+							logger.info("Message Sent");
 					}
 
 				} else

@@ -17,6 +17,7 @@ package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
 import gash.router.server.MessageServer;
+import gash.router.server.PrintUtil;
 import gash.router.server.edges.EdgeInfo;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -69,10 +70,11 @@ public class CommandInboundAppWorker extends Thread {
 						logger.info("ping from " + req.getHeader().getNodeId());
 						if(req.getHeader().getDestination() == sq.getRoutingConf().getNodeId()){
 							//handle message by self
-							System.out.println("Message for me: "+ payload.getMessage() + " from "+ req.getHeader().getSourceHost());
+							logger.info("Message for me: "+ payload.getMessage() + " from "+ req.getHeader().getSourceHost());
 						}
 						else{ //message doesn't belong to current node. Forward on other edges
 							msgDropFlag = true;
+							PrintUtil.printCommand((Pipe.CommandRequest) msg);
 							if(MessageServer.getEmon() != null){// forward if Comm-worker port is active
 								for(EdgeInfo ei :MessageServer.getEmon().getOutboundEdgeInfoList()){
 									if(ei.isActive() && ei.getChannel() != null){// check if channel of outboundWork edge is active
@@ -95,7 +97,7 @@ public class CommandInboundAppWorker extends Thread {
 										PerChannelWorkQueue edgeQueue = (PerChannelWorkQueue) ei.getQueue();
 										edgeQueue.enqueueResponse(work,ei.getChannel());
 										msgDropFlag = false;
-										logger.info("Workmessage sent");
+										logger.info("Workmessage queued");
 									}
 								}
 								if(msgDropFlag)

@@ -94,10 +94,11 @@ public class WorkInboundAppWorker extends Thread {
 						}
 						else { //message doesn't belong to current node. Forward on other edges
 							msgDropFlag = true;
+							PrintUtil.printWork(req);
 							if (req.getHeader().getMaxHops() > 0 && MessageServer.getEmon() != null) {// forward if Comm-worker port is active
 								for (EdgeInfo ei : MessageServer.getEmon().getOutboundEdgeInfoList()) {
 									if (ei.isActive() && ei.getChannel() != null) {// check if channel of outbound edge is active
-										logger.debug("Workmessage being sent");
+										logger.debug("Workmessage being queued");
 										Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
 
 										Common.Header.Builder hb = Common.Header.newBuilder();
@@ -115,7 +116,7 @@ public class WorkInboundAppWorker extends Thread {
 										PerChannelWorkQueue edgeQueue = (PerChannelWorkQueue) ei.getQueue();
 										edgeQueue.enqueueResponse(wb.build(),ei.getChannel());
 										msgDropFlag = false;
-										logger.debug("Workmessage sent");
+										logger.debug("Workmessage queued");
 									}
 								}
 								if (msgDropFlag)

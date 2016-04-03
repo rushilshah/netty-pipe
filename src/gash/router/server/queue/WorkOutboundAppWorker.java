@@ -57,21 +57,19 @@ public class WorkOutboundAppWorker extends Thread {
 					if (sq.channel != null && sq.channel.isOpen() && sq.channel.isWritable()) {
 						
 						ChannelFuture cf = sq.channel.writeAndFlush(msg);
-					
-						
-						
-						System.out.println("Server--sending -- response");
+
+						logger.info("Server--sending -- work-- response");
 						// blocks on write - use listener to be async
 						cf.awaitUninterruptibly();
-						System.out.println("Written to channel");
+						logger.debug("Written to channel");
 						rtn = cf.isSuccess();
 						if (!rtn) {
-							System.out.println("Sending failed " + rtn
+							logger.error("Sending failed " + rtn
 									+ "{Reason:" + cf.cause() + "}");
 							sq.outbound.putFirst(msg);
 						}
 						else
-							System.out.println("Message Send");
+							logger.info("Message Sent");
 					}
 
 				} else

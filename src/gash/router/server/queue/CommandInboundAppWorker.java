@@ -17,6 +17,7 @@ package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
 import gash.router.server.MessageServer;
+import gash.router.server.PrintUtil;
 import gash.router.server.edges.EdgeInfo;
 import gash.router.server.resources.Ping;
 import io.netty.channel.Channel;
@@ -96,7 +97,7 @@ public class CommandInboundAppWorker extends Thread {
 										PerChannelWorkQueue edgeQueue = (PerChannelWorkQueue) ei.getQueue();
 										edgeQueue.enqueueResponse(work,ei.getChannel());
 										msgDropFlag = false;
-										logger.info("Workmessage sent");
+										logger.info("Workmessage queued");
 									}
 								}
 								if(msgDropFlag)

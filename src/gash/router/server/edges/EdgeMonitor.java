@@ -111,7 +111,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					if (ei.isActive() && ei.getChannel() != null) {
 
 						Work.WorkRequest wm = createHB(ei);
-						logger.info("HeartBeat from: " + ei.getRef());
+						logger.info("HeartBeat To: " + ei.getRef());
 						ei.getChannel().writeAndFlush(wm);
 					} else {
 						// TODO create a client to the node

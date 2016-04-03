@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.Thread.State;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
@@ -54,8 +55,8 @@ public class PerChannelCommandQueue implements ChannelQueue {
 	RoutingConf conf;
 
 	// This implementation uses a fixed number of threads per channel
-	private CommandOutboundAppWorker oworker;
-	private CommandInboundAppWorker iworker;
+	private ArrayList<CommandOutboundAppWorker> oworkerList;
+	private ArrayList<CommandInboundAppWorker> iworkerList;
 
 	// not the best method to ensure uniqueness
 	private ThreadGroup tgroup = new ThreadGroup("PerChannelQ-" + System.nanoTime());
@@ -70,12 +71,24 @@ public class PerChannelCommandQueue implements ChannelQueue {
 		inboundWork = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
 		outboundWork = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
 
-		logger.info("Starting to listen to Command worker");
-		iworker = new CommandInboundAppWorker(tgroup, 1, this);
-		iworker.start();
+		oworkerList = new ArrayList<>(3);
+		iworkerList = new ArrayList<>(3);
 
-		oworker = new CommandOutboundAppWorker(tgroup, 1, this);
-		oworker.start();
+		logger.info("Starting to listen to Command worker");
+		//Creating worker threadpool
+		//Changed by: Rushil
+		for(int i=0;i<3;i++){
+			CommandInboundAppWorker tempWorker = new CommandInboundAppWorker(tgroup, i+1, this);
+			iworkerList.add(tempWorker);
+			tempWorker.start();
+		}
+
+		for(int i=0;i<3;i++){
+			CommandOutboundAppWorker tempWorker = new CommandOutboundAppWorker(tgroup, i+1, this);
+			oworkerList.add(tempWorker);
+			tempWorker.start();
+		}
+
 
 		// let the handler manage the queue's shutdown
 		// register listener to receive closing of channel
@@ -105,7 +118,7 @@ public class PerChannelCommandQueue implements ChannelQueue {
 	 */
 	@Override
 	public void shutdown(boolean hard) {
-		logger.info("server is shutting down");
+		logger.info("Command channel is shutting down");
 
 		channel = null;
 
@@ -115,18 +128,23 @@ public class PerChannelCommandQueue implements ChannelQueue {
 			outboundWork.clear();
 		}
 
-		if (iworker != null) {
-			iworker.forever = false;
-			if (iworker.getState() == State.BLOCKED || iworker.getState() == State.WAITING)
-				iworker.interrupt();
-			iworker = null;
+		for(int i=0;i<iworkerList.size();i++) {
+			CommandInboundAppWorker iworker = iworkerList.get(0);
+			if (iworker != null) {
+				iworker.forever = false;
+				if (iworker.getState() == State.BLOCKED || iworker.getState() == State.WAITING)
+					iworker.interrupt();
+			}
 		}
+		iworkerList.clear();
 
-		if (oworker != null) {
-			oworker.forever = false;
-			if (oworker.getState() == State.BLOCKED || oworker.getState() == State.WAITING)
-				oworker.interrupt();
-			oworker = null;
+		for(int i=0;i<oworkerList.size();i++) {
+			CommandOutboundAppWorker oworker = oworkerList.get(0);
+			if (oworker != null) {
+				oworker.forever = false;
+				if (oworker.getState() == State.BLOCKED || oworker.getState() == State.WAITING)
+					oworker.interrupt();
+			}
 		}
 
 	}

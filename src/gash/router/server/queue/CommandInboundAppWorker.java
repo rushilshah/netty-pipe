@@ -64,6 +64,7 @@ public class CommandInboundAppWorker extends Thread {
 
 					Pipe.CommandRequest req = ((Pipe.CommandRequest) msg);
 					Pipe.Payload payload = req.getPayload();
+
 					if (payload.hasPing()) {
 						logger.info("ping from " + req.getHeader().getNodeId());
 						if(req.getHeader().getDestinationHost().equals(Integer.toString( sq.getRoutingConf().getCommandPort()))){
@@ -108,7 +109,7 @@ public class CommandInboundAppWorker extends Thread {
 		}
 
 		if (!forever) {
-			logger.info("connection queue closing");
+			logger.info("Command incoming connection queue closing");
 		}
 	}
 }

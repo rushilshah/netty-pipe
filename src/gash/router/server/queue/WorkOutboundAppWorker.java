@@ -58,8 +58,7 @@ public class WorkOutboundAppWorker extends Thread {
 						
 						ChannelFuture cf = sq.channel.writeAndFlush(msg);
 					
-						
-						
+
 						System.out.println("Server--sending -- response");
 						// blocks on write - use listener to be async
 						cf.awaitUninterruptibly();

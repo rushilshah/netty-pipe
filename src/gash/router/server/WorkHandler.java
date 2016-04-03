@@ -133,7 +133,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<Work.WorkRequest> {
 		public void operationComplete(ChannelFuture channelFuture) throws Exception {
 
 			if(inQueue!=null)
-				inQueue.shutdown(true);
+				inQueue.shutdown(false);
 			inQueue = null;
 		}
 	}

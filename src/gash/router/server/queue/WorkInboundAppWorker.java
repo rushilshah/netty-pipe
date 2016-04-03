@@ -64,15 +64,12 @@ public class WorkInboundAppWorker extends Thread {
 					Work.WorkRequest req = ((Work.WorkRequest) msg);
 					Work.Payload payload = req.getPayload();
 
-					PrintUtil.printWork(req);
-
 					if (payload.hasBeat()) {
 						Work.Heartbeat hb = payload.getBeat();
 						logger.debug("heartbeat from " + req.getHeader().getNodeId());
 					} else if (payload.hasPing()) {
 						logger.info("ping from " + req.getHeader().getNodeId());
 						System.out.println("ping from " + req.getHeader().getNodeId() + " host: " + req.getHeader().getSourceHost());
-
 					} else if (payload.hasErr()) {
 						Common.Failure err = payload.getErr();
 						logger.error("failure from " + req.getHeader().getNodeId());
@@ -93,7 +90,7 @@ public class WorkInboundAppWorker extends Thread {
 		}
 
 		if (!forever) {
-			logger.info("connection queue closing");
+			logger.info("Work incoming connection queue closing");
 		}
 	}
 }

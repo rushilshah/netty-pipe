@@ -1623,17 +1623,30 @@ public final class Work {
     pipe.election.Election.LeaderStatusOrBuilder getLeaderOrBuilder();
 
     /**
-     * <code>optional .Request request = 16;</code>
+     * <code>optional .Query query = 16;</code>
      */
-    boolean hasRequest();
+    boolean hasQuery();
     /**
-     * <code>optional .Request request = 16;</code>
+     * <code>optional .Query query = 16;</code>
      */
-    pipe.common.Common.Request getRequest();
+    storage.Storage.Query getQuery();
     /**
-     * <code>optional .Request request = 16;</code>
+     * <code>optional .Query query = 16;</code>
      */
-    pipe.common.Common.RequestOrBuilder getRequestOrBuilder();
+    storage.Storage.QueryOrBuilder getQueryOrBuilder();
+
+    /**
+     * <code>optional .Response response = 17;</code>
+     */
+    boolean hasResponse();
+    /**
+     * <code>optional .Response response = 17;</code>
+     */
+    storage.Storage.Response getResponse();
+    /**
+     * <code>optional .Response response = 17;</code>
+     */
+    storage.Storage.ResponseOrBuilder getResponseOrBuilder();
   }
   /**
    * Protobuf type {@code Payload}
@@ -1758,16 +1771,29 @@ public final class Work {
               break;
             }
             case 130: {
-              pipe.common.Common.Request.Builder subBuilder = null;
+              storage.Storage.Query.Builder subBuilder = null;
               if (((bitField0_ & 0x00000040) == 0x00000040)) {
-                subBuilder = request_.toBuilder();
+                subBuilder = query_.toBuilder();
               }
-              request_ = input.readMessage(pipe.common.Common.Request.PARSER, extensionRegistry);
+              query_ = input.readMessage(storage.Storage.Query.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(request_);
-                request_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(query_);
+                query_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000040;
+              break;
+            }
+            case 138: {
+              storage.Storage.Response.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000080) == 0x00000080)) {
+                subBuilder = response_.toBuilder();
+              }
+              response_ = input.readMessage(storage.Storage.Response.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(response_);
+                response_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000080;
               break;
             }
           }
@@ -1950,25 +1976,46 @@ public final class Work {
       return leader_;
     }
 
-    public static final int REQUEST_FIELD_NUMBER = 16;
-    private pipe.common.Common.Request request_;
+    public static final int QUERY_FIELD_NUMBER = 16;
+    private storage.Storage.Query query_;
     /**
-     * <code>optional .Request request = 16;</code>
+     * <code>optional .Query query = 16;</code>
      */
-    public boolean hasRequest() {
+    public boolean hasQuery() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional .Request request = 16;</code>
+     * <code>optional .Query query = 16;</code>
      */
-    public pipe.common.Common.Request getRequest() {
-      return request_;
+    public storage.Storage.Query getQuery() {
+      return query_;
     }
     /**
-     * <code>optional .Request request = 16;</code>
+     * <code>optional .Query query = 16;</code>
      */
-    public pipe.common.Common.RequestOrBuilder getRequestOrBuilder() {
-      return request_;
+    public storage.Storage.QueryOrBuilder getQueryOrBuilder() {
+      return query_;
+    }
+
+    public static final int RESPONSE_FIELD_NUMBER = 17;
+    private storage.Storage.Response response_;
+    /**
+     * <code>optional .Response response = 17;</code>
+     */
+    public boolean hasResponse() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional .Response response = 17;</code>
+     */
+    public storage.Storage.Response getResponse() {
+      return response_;
+    }
+    /**
+     * <code>optional .Response response = 17;</code>
+     */
+    public storage.Storage.ResponseOrBuilder getResponseOrBuilder() {
+      return response_;
     }
 
     private void initFields() {
@@ -1978,7 +2025,8 @@ public final class Work {
       task_ = pipe.work.Work.Task.getDefaultInstance();
       state_ = pipe.work.Work.WorkState.getDefaultInstance();
       leader_ = pipe.election.Election.LeaderStatus.getDefaultInstance();
-      request_ = pipe.common.Common.Request.getDefaultInstance();
+      query_ = storage.Storage.Query.getDefaultInstance();
+      response_ = storage.Storage.Response.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2016,8 +2064,14 @@ public final class Work {
           return false;
         }
       }
-      if (hasRequest()) {
-        if (!getRequest().isInitialized()) {
+      if (hasQuery()) {
+        if (!getQuery().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      if (hasResponse()) {
+        if (!getResponse().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -2048,7 +2102,10 @@ public final class Work {
         output.writeMessage(8, leader_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeMessage(16, request_);
+        output.writeMessage(16, query_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeMessage(17, response_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2085,7 +2142,11 @@ public final class Work {
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(16, request_);
+          .computeMessageSize(16, query_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(17, response_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2201,7 +2262,8 @@ public final class Work {
           getTaskFieldBuilder();
           getStateFieldBuilder();
           getLeaderFieldBuilder();
-          getRequestFieldBuilder();
+          getQueryFieldBuilder();
+          getResponseFieldBuilder();
         }
       }
       private static Builder create() {
@@ -2242,12 +2304,18 @@ public final class Work {
           leaderBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000020);
-        if (requestBuilder_ == null) {
-          request_ = pipe.common.Common.Request.getDefaultInstance();
+        if (queryBuilder_ == null) {
+          query_ = storage.Storage.Query.getDefaultInstance();
         } else {
-          requestBuilder_.clear();
+          queryBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000040);
+        if (responseBuilder_ == null) {
+          response_ = storage.Storage.Response.getDefaultInstance();
+        } else {
+          responseBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -2323,10 +2391,18 @@ public final class Work {
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        if (requestBuilder_ == null) {
-          result.request_ = request_;
+        if (queryBuilder_ == null) {
+          result.query_ = query_;
         } else {
-          result.request_ = requestBuilder_.build();
+          result.query_ = queryBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        if (responseBuilder_ == null) {
+          result.response_ = response_;
+        } else {
+          result.response_ = responseBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -2362,8 +2438,11 @@ public final class Work {
         if (other.hasLeader()) {
           mergeLeader(other.getLeader());
         }
-        if (other.hasRequest()) {
-          mergeRequest(other.getRequest());
+        if (other.hasQuery()) {
+          mergeQuery(other.getQuery());
+        }
+        if (other.hasResponse()) {
+          mergeResponse(other.getResponse());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2400,8 +2479,14 @@ public final class Work {
             return false;
           }
         }
-        if (hasRequest()) {
-          if (!getRequest().isInitialized()) {
+        if (hasQuery()) {
+          if (!getQuery().isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (hasResponse()) {
+          if (!getResponse().isInitialized()) {
             
             return false;
           }
@@ -3092,120 +3177,236 @@ public final class Work {
         return leaderBuilder_;
       }
 
-      private pipe.common.Common.Request request_ = pipe.common.Common.Request.getDefaultInstance();
+      private storage.Storage.Query query_ = storage.Storage.Query.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder> requestBuilder_;
+          storage.Storage.Query, storage.Storage.Query.Builder, storage.Storage.QueryOrBuilder> queryBuilder_;
       /**
-       * <code>optional .Request request = 16;</code>
+       * <code>optional .Query query = 16;</code>
        */
-      public boolean hasRequest() {
+      public boolean hasQuery() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional .Request request = 16;</code>
+       * <code>optional .Query query = 16;</code>
        */
-      public pipe.common.Common.Request getRequest() {
-        if (requestBuilder_ == null) {
-          return request_;
+      public storage.Storage.Query getQuery() {
+        if (queryBuilder_ == null) {
+          return query_;
         } else {
-          return requestBuilder_.getMessage();
+          return queryBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .Request request = 16;</code>
+       * <code>optional .Query query = 16;</code>
        */
-      public Builder setRequest(pipe.common.Common.Request value) {
-        if (requestBuilder_ == null) {
+      public Builder setQuery(storage.Storage.Query value) {
+        if (queryBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          request_ = value;
+          query_ = value;
           onChanged();
         } else {
-          requestBuilder_.setMessage(value);
+          queryBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .Request request = 16;</code>
+       * <code>optional .Query query = 16;</code>
        */
-      public Builder setRequest(
-          pipe.common.Common.Request.Builder builderForValue) {
-        if (requestBuilder_ == null) {
-          request_ = builderForValue.build();
+      public Builder setQuery(
+          storage.Storage.Query.Builder builderForValue) {
+        if (queryBuilder_ == null) {
+          query_ = builderForValue.build();
           onChanged();
         } else {
-          requestBuilder_.setMessage(builderForValue.build());
+          queryBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .Request request = 16;</code>
+       * <code>optional .Query query = 16;</code>
        */
-      public Builder mergeRequest(pipe.common.Common.Request value) {
-        if (requestBuilder_ == null) {
+      public Builder mergeQuery(storage.Storage.Query value) {
+        if (queryBuilder_ == null) {
           if (((bitField0_ & 0x00000040) == 0x00000040) &&
-              request_ != pipe.common.Common.Request.getDefaultInstance()) {
-            request_ =
-              pipe.common.Common.Request.newBuilder(request_).mergeFrom(value).buildPartial();
+              query_ != storage.Storage.Query.getDefaultInstance()) {
+            query_ =
+              storage.Storage.Query.newBuilder(query_).mergeFrom(value).buildPartial();
           } else {
-            request_ = value;
+            query_ = value;
           }
           onChanged();
         } else {
-          requestBuilder_.mergeFrom(value);
+          queryBuilder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000040;
         return this;
       }
       /**
-       * <code>optional .Request request = 16;</code>
+       * <code>optional .Query query = 16;</code>
        */
-      public Builder clearRequest() {
-        if (requestBuilder_ == null) {
-          request_ = pipe.common.Common.Request.getDefaultInstance();
+      public Builder clearQuery() {
+        if (queryBuilder_ == null) {
+          query_ = storage.Storage.Query.getDefaultInstance();
           onChanged();
         } else {
-          requestBuilder_.clear();
+          queryBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
       /**
-       * <code>optional .Request request = 16;</code>
+       * <code>optional .Query query = 16;</code>
        */
-      public pipe.common.Common.Request.Builder getRequestBuilder() {
+      public storage.Storage.Query.Builder getQueryBuilder() {
         bitField0_ |= 0x00000040;
         onChanged();
-        return getRequestFieldBuilder().getBuilder();
+        return getQueryFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Request request = 16;</code>
+       * <code>optional .Query query = 16;</code>
        */
-      public pipe.common.Common.RequestOrBuilder getRequestOrBuilder() {
-        if (requestBuilder_ != null) {
-          return requestBuilder_.getMessageOrBuilder();
+      public storage.Storage.QueryOrBuilder getQueryOrBuilder() {
+        if (queryBuilder_ != null) {
+          return queryBuilder_.getMessageOrBuilder();
         } else {
-          return request_;
+          return query_;
         }
       }
       /**
-       * <code>optional .Request request = 16;</code>
+       * <code>optional .Query query = 16;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder> 
-          getRequestFieldBuilder() {
-        if (requestBuilder_ == null) {
-          requestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder>(
-                  getRequest(),
+          storage.Storage.Query, storage.Storage.Query.Builder, storage.Storage.QueryOrBuilder> 
+          getQueryFieldBuilder() {
+        if (queryBuilder_ == null) {
+          queryBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              storage.Storage.Query, storage.Storage.Query.Builder, storage.Storage.QueryOrBuilder>(
+                  getQuery(),
                   getParentForChildren(),
                   isClean());
-          request_ = null;
+          query_ = null;
         }
-        return requestBuilder_;
+        return queryBuilder_;
+      }
+
+      private storage.Storage.Response response_ = storage.Storage.Response.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          storage.Storage.Response, storage.Storage.Response.Builder, storage.Storage.ResponseOrBuilder> responseBuilder_;
+      /**
+       * <code>optional .Response response = 17;</code>
+       */
+      public boolean hasResponse() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional .Response response = 17;</code>
+       */
+      public storage.Storage.Response getResponse() {
+        if (responseBuilder_ == null) {
+          return response_;
+        } else {
+          return responseBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .Response response = 17;</code>
+       */
+      public Builder setResponse(storage.Storage.Response value) {
+        if (responseBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          response_ = value;
+          onChanged();
+        } else {
+          responseBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000080;
+        return this;
+      }
+      /**
+       * <code>optional .Response response = 17;</code>
+       */
+      public Builder setResponse(
+          storage.Storage.Response.Builder builderForValue) {
+        if (responseBuilder_ == null) {
+          response_ = builderForValue.build();
+          onChanged();
+        } else {
+          responseBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000080;
+        return this;
+      }
+      /**
+       * <code>optional .Response response = 17;</code>
+       */
+      public Builder mergeResponse(storage.Storage.Response value) {
+        if (responseBuilder_ == null) {
+          if (((bitField0_ & 0x00000080) == 0x00000080) &&
+              response_ != storage.Storage.Response.getDefaultInstance()) {
+            response_ =
+              storage.Storage.Response.newBuilder(response_).mergeFrom(value).buildPartial();
+          } else {
+            response_ = value;
+          }
+          onChanged();
+        } else {
+          responseBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000080;
+        return this;
+      }
+      /**
+       * <code>optional .Response response = 17;</code>
+       */
+      public Builder clearResponse() {
+        if (responseBuilder_ == null) {
+          response_ = storage.Storage.Response.getDefaultInstance();
+          onChanged();
+        } else {
+          responseBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000080);
+        return this;
+      }
+      /**
+       * <code>optional .Response response = 17;</code>
+       */
+      public storage.Storage.Response.Builder getResponseBuilder() {
+        bitField0_ |= 0x00000080;
+        onChanged();
+        return getResponseFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .Response response = 17;</code>
+       */
+      public storage.Storage.ResponseOrBuilder getResponseOrBuilder() {
+        if (responseBuilder_ != null) {
+          return responseBuilder_.getMessageOrBuilder();
+        } else {
+          return response_;
+        }
+      }
+      /**
+       * <code>optional .Response response = 17;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          storage.Storage.Response, storage.Storage.Response.Builder, storage.Storage.ResponseOrBuilder> 
+          getResponseFieldBuilder() {
+        if (responseBuilder_ == null) {
+          responseBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              storage.Storage.Response, storage.Storage.Response.Builder, storage.Storage.ResponseOrBuilder>(
+                  getResponse(),
+                  getParentForChildren(),
+                  isClean());
+          response_ = null;
+        }
+        return responseBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:Payload)
@@ -4069,15 +4270,16 @@ public final class Work {
   static {
     java.lang.String[] descriptorData = {
       "\n\nwork.proto\032\014common.proto\032\016election.pro" +
-      "to\"0\n\tWorkState\022\020\n\010enqueued\030\001 \002(\005\022\021\n\tpro" +
-      "cessed\030\002 \002(\005\"&\n\tHeartbeat\022\031\n\005state\030\001 \002(\013" +
-      "2\n.WorkState\")\n\004Task\022\021\n\tseries_id\030\001 \002(\003\022" +
-      "\016\n\006seq_id\030\002 \002(\005\"\262\001\n\007Payload\022\025\n\003err\030\003 \001(\013" +
-      "2\010.Failure\022\014\n\004ping\030\004 \001(\010\022\030\n\004beat\030\005 \001(\0132\n" +
-      ".Heartbeat\022\023\n\004task\030\006 \001(\0132\005.Task\022\031\n\005state" +
-      "\030\007 \001(\0132\n.WorkState\022\035\n\006leader\030\010 \001(\0132\r.Lea" +
-      "derStatus\022\031\n\007request\030\020 \001(\0132\010.Request\"Q\n\013" +
-      "WorkRequest\022\027\n\006header\030\001 \002(\0132\007.Header\022\016\n\006",
+      "to\032\rstorage.proto\"0\n\tWorkState\022\020\n\010enqueu" +
+      "ed\030\001 \002(\005\022\021\n\tprocessed\030\002 \002(\005\"&\n\tHeartbeat" +
+      "\022\031\n\005state\030\001 \002(\0132\n.WorkState\")\n\004Task\022\021\n\ts" +
+      "eries_id\030\001 \002(\003\022\016\n\006seq_id\030\002 \002(\005\"\313\001\n\007Paylo" +
+      "ad\022\025\n\003err\030\003 \001(\0132\010.Failure\022\014\n\004ping\030\004 \001(\010\022" +
+      "\030\n\004beat\030\005 \001(\0132\n.Heartbeat\022\023\n\004task\030\006 \001(\0132" +
+      "\005.Task\022\031\n\005state\030\007 \001(\0132\n.WorkState\022\035\n\006lea" +
+      "der\030\010 \001(\0132\r.LeaderStatus\022\025\n\005query\030\020 \001(\0132" +
+      "\006.Query\022\033\n\010response\030\021 \001(\0132\t.Response\"Q\n\013",
+      "WorkRequest\022\027\n\006header\030\001 \002(\0132\007.Header\022\016\n\006" +
       "secret\030\002 \001(\003\022\031\n\007payload\030\003 \002(\0132\010.PayloadB" +
       "\r\n\tpipe.workH\001"
     };
@@ -4094,6 +4296,7 @@ public final class Work {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           pipe.common.Common.getDescriptor(),
           pipe.election.Election.getDescriptor(),
+          storage.Storage.getDescriptor(),
         }, assigner);
     internal_static_WorkState_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -4118,7 +4321,7 @@ public final class Work {
     internal_static_Payload_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Payload_descriptor,
-        new java.lang.String[] { "Err", "Ping", "Beat", "Task", "State", "Leader", "Request", });
+        new java.lang.String[] { "Err", "Ping", "Beat", "Task", "State", "Leader", "Query", "Response", });
     internal_static_WorkRequest_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_WorkRequest_fieldAccessorTable = new
@@ -4127,6 +4330,7 @@ public final class Work {
         new java.lang.String[] { "Header", "Secret", "Payload", });
     pipe.common.Common.getDescriptor();
     pipe.election.Election.getDescriptor();
+    storage.Storage.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

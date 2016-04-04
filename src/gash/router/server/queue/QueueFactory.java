@@ -18,6 +18,8 @@ package gash.router.server.queue;
 import gash.router.container.RoutingConf;
 import gash.router.server.ServerState;
 import gash.router.server.WorkHandler;
+import gash.router.server.queue.command.PerChannelCommandQueue;
+import gash.router.server.queue.work.PerChannelWorkQueue;
 import io.netty.channel.Channel;
 
 public class QueueFactory {

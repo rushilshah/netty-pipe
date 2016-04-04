@@ -3,21 +3,25 @@ package database.model;
 /**
  * Created by manthan on 4/3/16.
  */
-public class MongoDataModel {
+public class DataModel {
     String name;
     int seqNumber;
     byte[] dataChunk;
+    int seqSize;
 
-    public MongoDataModel(String name, byte[] dataChunk){
+
+    public DataModel(String name, byte[] dataChunk){
         this.name = name;
-        this.seqNumber = 0;
+        this.seqNumber = -1;
         this.dataChunk = dataChunk;
+        this.seqSize=0;
     }
 
-    public MongoDataModel(String name, int seqNumber, byte[] dataChunk){
+    public DataModel(String name, int seqNumber, byte[] dataChunk){
         this.name = name;
         this.seqNumber = seqNumber;
         this.dataChunk = dataChunk;
+        this.seqSize=0;
     }
 
     public String getName() {
@@ -42,5 +46,13 @@ public class MongoDataModel {
 
     public void setDataChunk(byte[] dataChunk) {
         this.dataChunk = dataChunk;
+    }
+
+    public int getSeqSize() {
+        return seqSize;
+    }
+
+    public void setSeqSize(int seqSize) {
+        this.seqSize = seqSize;
     }
 }

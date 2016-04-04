@@ -1,12 +1,14 @@
 package database.dbconnetor;
 
 import com.aerospike.client.AerospikeClient;
+import database.model.DBConfigModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -15,10 +17,12 @@ import java.util.Properties;
 public class AerospikeConnector {
     protected static Logger logger = LoggerFactory.getLogger("aerospike");
 
-    static Properties configProperty;
-    static InputStream inputStream;
+    private static Properties configProperty;
+    private static InputStream inputStream;
 
-    private static AerospikeClient getConnection(){
+    private static HashMap<DBConfigModel,AerospikeClient> connectionMap= new HashMap<>();
+
+    public static AerospikeClient getConnection(){
 
         AerospikeClient ac = null;
 
@@ -31,7 +35,14 @@ public class AerospikeConnector {
         else {
             try {
                 configProperty.load(inputStream);
-                ac = new AerospikeClient(configProperty.getProperty("host"), Integer.parseInt(configProperty.getProperty("port")));
+                DBConfigModel dbConfig = new DBConfigModel(configProperty.getProperty("host"), Integer.parseInt(configProperty.getProperty("port")));
+                if(connectionMap.containsKey(dbConfig))
+                    ac = connectionMap.get(dbConfig);
+                else {
+                    ac = new AerospikeClient(dbConfig.getHost(), dbConfig.getPort());
+                    connectionMap.put(dbConfig,ac);
+                }
+
             } catch (UnknownHostException e) {
                 logger.error(e.getMessage());
             } catch (IOException e) {
@@ -39,5 +50,9 @@ public class AerospikeConnector {
             }
         }
         return ac;
+    }
+
+    public static String getDatabaseName(){
+        return configProperty.getProperty("dbName");
     }
 }

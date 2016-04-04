@@ -5,7 +5,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import database.dbconnetor.MongoConnector;
-import database.model.MongoDataModel;
+import database.model.DataModel;
 
 import java.util.ArrayList;
 
@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 public class MongoDAO {
 
-    public static int saveData(String collectionName, MongoDataModel data){
+    public static int saveData(String collectionName, DataModel data){
         int result = 0;
         DBCollection dbCollection = MongoConnector.connectToCollection(collectionName);
         if(dbCollection != null){
@@ -30,8 +30,8 @@ public class MongoDAO {
         return result;
     }
 
-    public static ArrayList<MongoDataModel> getData(String collectionName, MongoDataModel data){
-        ArrayList<MongoDataModel> result = null;
+    public static ArrayList<DataModel> getData(String collectionName, DataModel data){
+        ArrayList<DataModel> result = null;
         DBCollection dbCollection = MongoConnector.connectToCollection(collectionName);
         if(dbCollection != null){
             DBObject query = BasicDBObjectBuilder.start().add("name", data.getName()).get();
@@ -39,22 +39,22 @@ public class MongoDAO {
             if(cursor.size() > 0) {
                 result = new ArrayList<>();
                 while (cursor.hasNext()) {
-                    result.add((MongoDataModel) cursor.next());
+                    result.add((DataModel) cursor.next());
                 }
             }
         }
         return result;
     }
 
-    public static MongoDataModel getSingleData(String collectionName, MongoDataModel data){
-        MongoDataModel result = null;
+    public static DataModel getSingleData(String collectionName, DataModel data){
+        DataModel result = null;
         DBCollection dbCollection = MongoConnector.connectToCollection(collectionName);
         if(dbCollection != null){
             DBObject query = BasicDBObjectBuilder.start().add("name", data.getName()).add("seqNumber",data.getSeqNumber()).get();
             DBCursor cursor = dbCollection.find(query);
             if(cursor.size() == 1) {
                 while (cursor.hasNext()) {
-                    result = (MongoDataModel) cursor.next();
+                    result = (DataModel) cursor.next();
                 }
             }
         }

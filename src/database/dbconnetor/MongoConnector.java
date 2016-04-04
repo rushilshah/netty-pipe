@@ -1,14 +1,17 @@
 package database.dbconnetor;
 
+import com.aerospike.client.AerospikeClient;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import database.model.DBConfigModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -18,8 +21,9 @@ public class MongoConnector {
 
     protected static Logger logger = LoggerFactory.getLogger("mongo");
 
-    static Properties configProperty;
-    static InputStream inputStream;
+    private static Properties configProperty;
+    private static InputStream inputStream;
+    private static HashMap<DBConfigModel,MongoClient> connectionMap= new HashMap<>();
 
     private static MongoClient getConnection(){
 
@@ -35,7 +39,13 @@ public class MongoConnector {
 
             try {
                 configProperty.load(inputStream);
-                mc = new MongoClient(configProperty.getProperty("host"), Integer.parseInt(configProperty.getProperty("port")));
+                DBConfigModel dbConfig = new DBConfigModel(configProperty.getProperty("host"), Integer.parseInt(configProperty.getProperty("port")));
+                if(connectionMap.containsKey(dbConfig))
+                    mc = connectionMap.get(dbConfig);
+                else {
+                    mc = new MongoClient(dbConfig.getHost(),dbConfig.getPort());
+                    connectionMap.put(dbConfig,mc);
+                }
             } catch (UnknownHostException e) {
                 logger.error(e.getMessage());
             } catch (IOException e) {

@@ -105,7 +105,7 @@ public class PerChannelCommandQueue implements ChannelQueue {
 	 */
 	@Override
 	public void shutdown(boolean hard) {
-		logger.info("server is shutting down");
+		logger.debug("command queue server is shutting down");
 
 		channel = null;
 

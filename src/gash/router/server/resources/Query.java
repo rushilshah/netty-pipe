@@ -3,6 +3,7 @@ package gash.router.server.resources;
 import com.google.protobuf.ByteString;
 import database.dao.MongoDAO;
 import database.model.MongoDataModel;
+import gash.router.server.PrintUtil;
 import gash.router.server.queue.ChannelQueue;
 import gash.router.server.queue.PerChannelGlobalCommandQueue;
 import global.Global;
@@ -32,7 +33,8 @@ public class Query extends Resource {
         if (msg.getHeader().getDestination() == ((PerChannelGlobalCommandQueue) sq).getRoutingConf().getNodeId()) {
             switch (query.getAction()) {
                 case GET:
-                    ArrayList<MongoDataModel> arrRespData = MongoDAO.getData("temp",new MongoDataModel(query.getKey(),null));
+                    PrintUtil.printGlobalCommand(msg);
+                    /*ArrayList<MongoDataModel> arrRespData = MongoDAO.getData("temp",new MongoDataModel(query.getKey(),null));
                     for(MongoDataModel dataModel : arrRespData){
                         Storage.Response.Builder rb = Storage.Response.newBuilder();
                         rb.setAction(Storage.Action.GET);
@@ -40,13 +42,14 @@ public class Query extends Resource {
                         rb.setKey(dataModel.getName());
                         rb.setSequenceNo(dataModel.getSeqNumber());
                         rb.setData(ByteString.copyFrom(dataModel.getDataChunk()));
-                    }
+                    }*/
                     break;
                 case STORE:
-                    int result = MongoDAO.saveData("temp",new MongoDataModel(query.getKey(),query.getSequenceNo(),query.getData().toByteArray()));
+                    /*int result = MongoDAO.saveData("temp",new MongoDataModel(query.getKey(),query.getSequenceNo(),query.getData().toByteArray()));
                     Storage.Response.Builder rb = Storage.Response.newBuilder();
                     rb.setAction(Storage.Action.GET);
-                    rb.setSuccess(result>0);
+                    rb.setSuccess(result>0);*/
+                    PrintUtil.printGlobalCommand(msg);
                     break;
                 case UPDATE:
                 case DELETE:

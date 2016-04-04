@@ -1,10 +1,9 @@
 package gash.router.server.resources;
 
-import com.google.protobuf.GeneratedMessage;
 import gash.router.server.queue.ChannelQueue;
-import gash.router.server.queue.command.PerChannelCommandQueue;
-import gash.router.server.queue.global.PerChannelGlobalCommandQueue;
-import gash.router.server.queue.work.PerChannelWorkQueue;
+import gash.router.server.queue.PerChannelCommandQueue;
+import gash.router.server.queue.PerChannelGlobalCommandQueue;
+import gash.router.server.queue.PerChannelWorkQueue;
 import global.Global;
 import pipe.work.Work;
 import routing.Pipe;
@@ -13,8 +12,6 @@ import routing.Pipe;
  * Created by rushil on 4/2/16.
  */
 public class Task extends Resource {
-
-    ChannelQueue sq;
 
     public Task(ChannelQueue sq){
         this.sq = sq;
@@ -47,17 +44,5 @@ public class Task extends Resource {
         ((PerChannelWorkQueue)sq).gerServerState().getTasks().addTask(t);
     }
 
-    @Override
-    public void handle(GeneratedMessage msg) {
-
-        if(msg instanceof Global.GlobalCommandMessage){
-
-        }else if(msg instanceof Pipe.CommandRequest){
-
-        }else if(msg instanceof Work.WorkRequest){
-
-        }
-
-    }
 
 }

@@ -13,28 +13,27 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package gash.router.server.queue.work;
+package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pipe.work.Work;
 
-public class WorkOutboundAppWorker extends Thread {
+public class CommandOutboundAppWorker extends Thread {
 	protected static Logger logger = LoggerFactory.getLogger("server");
 
 	int workerId;
-	PerChannelWorkQueue sq;
+	PerChannelCommandQueue sq;
 	boolean forever = true;
 
-	public WorkOutboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelWorkQueue sq) {
+	public CommandOutboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelCommandQueue sq) {
 		super(tgrp, "outboundWork-" + workerId);
 		this.workerId = workerId;
 		this.sq = sq;
 
-		if (sq.outbound == null)
+		if (sq.outboundWork == null)
 			throw new RuntimeException("connection worker detected no outboundWork queue");
 	}
 
@@ -42,39 +41,41 @@ public class WorkOutboundAppWorker extends Thread {
 	public void run() {
 		Channel conn = sq.channel;
 		if (conn == null || !conn.isOpen()) {
-			PerChannelWorkQueue.logger.error("connection missing, no outboundWork communication");
+			PerChannelCommandQueue.logger.error("connection missing, no outboundWork communication");
 			return;
 		}
 
 		while (true) {
-			if (!forever && sq.outbound.size() == 0)
+			if (!forever && sq.outboundWork.size() == 0)
 				break;
 
 			try {
 				// block until a message is enqueued
-				GeneratedMessage msg = sq.outbound.take();
+				GeneratedMessage msg = sq.outboundWork.take();
 				if (conn.isWritable()) {
 					boolean rtn = false;
 					if (sq.channel != null && sq.channel.isOpen() && sq.channel.isWritable()) {
 						
-						ChannelFuture cf = sq.channel.writeAndFlush((Work.WorkRequest)msg);
-
-						logger.info("Server--sending -- work-- response");
+						ChannelFuture cf = sq.channel.writeAndFlush(msg);
+					
+						
+						
+						logger.info("Server--sending -- command -- response");
 						// blocks on write - use listener to be async
 						cf.awaitUninterruptibly();
 						logger.debug("Written to channel");
 						rtn = cf.isSuccess();
 						if (!rtn) {
-							logger.error("Sending failed " + rtn
+							System.out.println("Sending failed " + rtn
 									+ "{Reason:" + cf.cause() + "}");
-							sq.outbound.putFirst(msg);
+							sq.outboundWork.putFirst(msg);
 						}
 						else
 							logger.info("Message Sent");
 					}
 
 				} else
-					sq.outbound.putFirst(msg);
+					sq.outboundWork.putFirst(msg);
 			} catch (InterruptedException ie) {
 				break;
 			} catch (Exception e) {

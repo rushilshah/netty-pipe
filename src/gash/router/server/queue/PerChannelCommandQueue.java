@@ -13,12 +13,11 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package gash.router.server.queue.command;
+package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
 import gash.router.container.RoutingConf;
 import gash.router.server.ServerState;
-import gash.router.server.queue.ChannelQueue;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;

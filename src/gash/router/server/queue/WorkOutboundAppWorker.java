@@ -13,29 +13,28 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package gash.router.server.queue.global;
+package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
-import gash.router.server.queue.command.PerChannelCommandQueue;
-import gash.router.server.queue.work.PerChannelWorkQueue;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pipe.work.Work;
 
-public class GlobalCommandOutboundAppWorker extends Thread {
+public class WorkOutboundAppWorker extends Thread {
 	protected static Logger logger = LoggerFactory.getLogger("server");
 
 	int workerId;
-	PerChannelGlobalCommandQueue sq;
+	PerChannelWorkQueue sq;
 	boolean forever = true;
 
-	public GlobalCommandOutboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelGlobalCommandQueue sq) {
+	public WorkOutboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelWorkQueue sq) {
 		super(tgrp, "outboundWork-" + workerId);
 		this.workerId = workerId;
 		this.sq = sq;
 
-		if (sq.outboundWork == null)
+		if (sq.outbound == null)
 			throw new RuntimeException("connection worker detected no outboundWork queue");
 	}
 
@@ -43,41 +42,39 @@ public class GlobalCommandOutboundAppWorker extends Thread {
 	public void run() {
 		Channel conn = sq.channel;
 		if (conn == null || !conn.isOpen()) {
-			PerChannelGlobalCommandQueue.logger.error("connection missing, no outboundWork communication");
+			PerChannelWorkQueue.logger.error("connection missing, no outboundWork communication");
 			return;
 		}
 
 		while (true) {
-			if (!forever && sq.outboundWork.size() == 0)
+			if (!forever && sq.outbound.size() == 0)
 				break;
 
 			try {
 				// block until a message is enqueued
-				GeneratedMessage msg = sq.outboundWork.take();
+				GeneratedMessage msg = sq.outbound.take();
 				if (conn.isWritable()) {
 					boolean rtn = false;
 					if (sq.channel != null && sq.channel.isOpen() && sq.channel.isWritable()) {
 						
-						ChannelFuture cf = sq.channel.writeAndFlush(msg);
-					
-						
-						
-						logger.info("Server--sending -- command -- response");
+						ChannelFuture cf = sq.channel.writeAndFlush((Work.WorkRequest)msg);
+
+						logger.info("Server--sending -- work-- response");
 						// blocks on write - use listener to be async
 						cf.awaitUninterruptibly();
 						logger.debug("Written to channel");
 						rtn = cf.isSuccess();
 						if (!rtn) {
-							System.out.println("Sending failed " + rtn
+							logger.error("Sending failed " + rtn
 									+ "{Reason:" + cf.cause() + "}");
-							sq.outboundWork.putFirst(msg);
+							sq.outbound.putFirst(msg);
 						}
 						else
 							logger.info("Message Sent");
 					}
 
 				} else
-					sq.outboundWork.putFirst(msg);
+					sq.outbound.putFirst(msg);
 			} catch (InterruptedException ie) {
 				break;
 			} catch (Exception e) {

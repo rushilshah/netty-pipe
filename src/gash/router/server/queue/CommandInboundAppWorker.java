@@ -13,18 +13,13 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package gash.router.server.queue.command;
+package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
-import gash.router.server.MessageServer;
-import gash.router.server.edges.EdgeInfo;
-import gash.router.server.queue.work.PerChannelWorkQueue;
 import gash.router.server.resources.Ping;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pipe.common.Common;
-import pipe.work.Work;
 import routing.Pipe;
 
 public class CommandInboundAppWorker extends Thread {

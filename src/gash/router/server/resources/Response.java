@@ -1,5 +1,6 @@
 package gash.router.server.resources;
 
+import gash.router.server.queue.ChannelQueue;
 import global.Global;
 import pipe.work.Work;
 import routing.Pipe;
@@ -11,6 +12,10 @@ import storage.Storage;
 public class Response extends Resource {
 
     Storage.Response response;
+
+    public Response(ChannelQueue sq){
+        super(sq);
+    }
 
     public void handleGlobalCommand(Global.GlobalCommandMessage msg) {
 

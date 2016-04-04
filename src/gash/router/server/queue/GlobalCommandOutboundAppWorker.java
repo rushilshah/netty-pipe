@@ -13,23 +13,22 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package gash.router.server.queue.command;
+package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
-import gash.router.server.queue.work.PerChannelWorkQueue;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CommandOutboundAppWorker extends Thread {
+public class GlobalCommandOutboundAppWorker extends Thread {
 	protected static Logger logger = LoggerFactory.getLogger("server");
 
 	int workerId;
-	PerChannelCommandQueue sq;
+	PerChannelGlobalCommandQueue sq;
 	boolean forever = true;
 
-	public CommandOutboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelCommandQueue sq) {
+	public GlobalCommandOutboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelGlobalCommandQueue sq) {
 		super(tgrp, "outboundWork-" + workerId);
 		this.workerId = workerId;
 		this.sq = sq;
@@ -42,7 +41,7 @@ public class CommandOutboundAppWorker extends Thread {
 	public void run() {
 		Channel conn = sq.channel;
 		if (conn == null || !conn.isOpen()) {
-			PerChannelCommandQueue.logger.error("connection missing, no outboundWork communication");
+			PerChannelGlobalCommandQueue.logger.error("connection missing, no outboundWork communication");
 			return;
 		}
 

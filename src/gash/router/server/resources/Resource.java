@@ -1,6 +1,7 @@
 package gash.router.server.resources;
 
 import com.google.protobuf.GeneratedMessage;
+import gash.router.server.queue.ChannelQueue;
 import global.Global;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,16 @@ import routing.Pipe;
 public class Resource {
 
     Logger logger = LoggerFactory.getLogger("Resource Handling");
+
+    ChannelQueue sq;
+
+    Resource(){
+
+    }
+
+    Resource(ChannelQueue sq){
+        this.sq = sq;
+    }
 
     void handleGlobalCommand(Global.GlobalCommandMessage msg){
 

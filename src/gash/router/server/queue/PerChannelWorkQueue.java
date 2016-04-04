@@ -13,14 +13,11 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package gash.router.server.queue.global;
+package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
 import gash.router.container.RoutingConf;
 import gash.router.server.ServerState;
-import gash.router.server.queue.ChannelQueue;
-import gash.router.server.queue.command.CommandInboundAppWorker;
-import gash.router.server.queue.command.CommandOutboundAppWorker;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -42,8 +39,8 @@ import java.util.concurrent.LinkedBlockingDeque;
  * @author gash
  * 
  */
-public class PerChannelGlobalCommandQueue implements ChannelQueue {
-	protected static Logger logger = LoggerFactory.getLogger("PerChannelCommandQueue");
+public class PerChannelWorkQueue implements ChannelQueue {
+	protected static Logger logger = LoggerFactory.getLogger("PerChannelWorkQueue");
 
 	// The queues feed work to the inboundWork and outboundWork threads (workers). The
 	// threads perform a blocking 'get' on the queue until a new event/task is
@@ -51,44 +48,43 @@ public class PerChannelGlobalCommandQueue implements ChannelQueue {
 	// threads
 	//
 	// Note these are directly accessible by the workers
-	LinkedBlockingDeque<GeneratedMessage> inboundWork;
-	LinkedBlockingDeque<GeneratedMessage> outboundWork;
-
+	LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> inbound;
+	LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> outbound;
 	Channel channel;
-	RoutingConf conf;
+	ServerState state;
 
 	// This implementation uses a fixed number of threads per channel
-	private ArrayList<GlobalCommandOutboundAppWorker> oworkerList;
-	private ArrayList<GlobalCommandInboundAppWorker> iworkerList;
+	private ArrayList<WorkOutboundAppWorker> oworkerList;
+	private ArrayList<WorkInboundAppWorker> iworkerList;
 
 	// not the best method to ensure uniqueness
 	private ThreadGroup tgroup = new ThreadGroup("PerChannelQ-" + System.nanoTime());
 
-	public PerChannelGlobalCommandQueue(Channel channel, RoutingConf conf) {
+	public PerChannelWorkQueue(Channel channel,ServerState state) {
 		this.channel = channel;
-		this.conf = conf;
+		this.state = state;
 		init();
 	}
 
 	protected void init() {
-		inboundWork = new LinkedBlockingDeque<GeneratedMessage>();
-		outboundWork = new LinkedBlockingDeque<GeneratedMessage>();
+		inbound = new LinkedBlockingDeque<>();
+		outbound = new LinkedBlockingDeque<>();
 
 		oworkerList = new ArrayList<>(3);
 		iworkerList = new ArrayList<>(3);
 
-		logger.info("Starting to listen to Command worker");
+		logger.info("Starting to listen to Work worker");
 		//Creating worker threadpool
 		//Changed by: Rushil
 		for(int i=0;i<3;i++){
-			GlobalCommandInboundAppWorker tempWorker = new GlobalCommandInboundAppWorker(tgroup, i+1, this);
-			iworkerList.add(tempWorker);
+			WorkOutboundAppWorker tempWorker = new WorkOutboundAppWorker(tgroup, i+1, this);
+			oworkerList.add(tempWorker);
 			tempWorker.start();
 		}
 
 		for(int i=0;i<3;i++){
-			GlobalCommandOutboundAppWorker tempWorker = new GlobalCommandOutboundAppWorker(tgroup, i+1, this);
-			oworkerList.add(tempWorker);
+			WorkInboundAppWorker tempWorker = new WorkInboundAppWorker(tgroup, i+1, this);
+			iworkerList.add(tempWorker);
 			tempWorker.start();
 		}
 
@@ -98,41 +94,42 @@ public class PerChannelGlobalCommandQueue implements ChannelQueue {
 		// channel.getCloseFuture().addListener(new CloseListener(this));
 	}
 
-	protected Channel getChannel() {
+	public Channel getChannel() {
 		return channel;
 	}
 
-	public RoutingConf getRoutingConf(){
-		return conf;
+	public ServerState gerServerState(){
+		return state;
 	}
 
 	public void setState(ServerState state) {
-		//Nothing to do with this class
+		this.state = state;
 	}
 
 	@Override
 	public void setRouteConfig(RoutingConf config) {
-		this.conf = config;
+		//Nothing to do with this class
 	}
+
 	/*
-	 * (non-Javadoc)
-	 *
-	 * @see poke.server.ChannelQueue#shutdown(boolean)
-	 */
+             * (non-Javadoc)
+             *
+             * @see poke.server.ChannelQueue#shutdown(boolean)
+             */
 	@Override
 	public void shutdown(boolean hard) {
-		logger.info("Command channel is shutting down");
+		logger.info("Work channel is shutting down");
 
 		channel = null;
 
 		if (hard) {
 			// drain queues, don't allow graceful completion
-			inboundWork.clear();
-			outboundWork.clear();
+			inbound.clear();
+			outbound.clear();
 		}
 
 		for(int i=0;i<iworkerList.size();i++) {
-			GlobalCommandInboundAppWorker iworker = iworkerList.get(0);
+			WorkInboundAppWorker iworker = iworkerList.get(0);
 			if (iworker != null) {
 				iworker.forever = false;
 				if (iworker.getState() == State.BLOCKED || iworker.getState() == State.WAITING)
@@ -142,25 +139,26 @@ public class PerChannelGlobalCommandQueue implements ChannelQueue {
 		iworkerList.clear();
 
 		for(int i=0;i<oworkerList.size();i++) {
-			GlobalCommandOutboundAppWorker oworker = oworkerList.get(0);
+			WorkOutboundAppWorker oworker = oworkerList.get(0);
 			if (oworker != null) {
 				oworker.forever = false;
 				if (oworker.getState() == State.BLOCKED || oworker.getState() == State.WAITING)
 					oworker.interrupt();
 			}
 		}
+		oworkerList.clear();
 
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see poke.server.ChannelQueue#enqueueRequest(eye.Comm.Finger)
 	 */
 	@Override
 	public void enqueueRequest(GeneratedMessage req, Channel notused) {
 		try {
-			inboundWork.put(req);
+			inbound.put(req);
 		} catch (InterruptedException e) {
 			logger.error("message not enqueued for processing", e);
 		}
@@ -168,7 +166,7 @@ public class PerChannelGlobalCommandQueue implements ChannelQueue {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see poke.server.ChannelQueue#enqueueResponse(eye.Comm.Response)
 	 */
 	@Override
@@ -177,7 +175,7 @@ public class PerChannelGlobalCommandQueue implements ChannelQueue {
 			return;
 
 		try {
-			outboundWork.put(reply);
+			outbound.put(reply);
 		} catch (InterruptedException e) {
 			logger.error("message not enqueued for reply", e);
 		}
@@ -196,11 +194,11 @@ public class PerChannelGlobalCommandQueue implements ChannelQueue {
 		}
 	}
 
-	public LinkedBlockingDeque<GeneratedMessage> getInboundWork() {
-		return inboundWork;
+	public LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> getInbound() {
+		return inbound;
 	}
 
-	public LinkedBlockingDeque<GeneratedMessage> getOutboundWork() {
-		return outboundWork;
+	public LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> getOutbound() {
+		return outbound;
 	}
 }

@@ -1,13 +1,12 @@
 package gash.router.server.resources;
 
-import com.google.protobuf.GeneratedMessage;
 import gash.router.server.MessageServer;
 import gash.router.server.PrintUtil;
 import gash.router.server.edges.EdgeInfo;
 import gash.router.server.queue.ChannelQueue;
-import gash.router.server.queue.command.PerChannelCommandQueue;
-import gash.router.server.queue.global.PerChannelGlobalCommandQueue;
-import gash.router.server.queue.work.PerChannelWorkQueue;
+import gash.router.server.queue.PerChannelCommandQueue;
+import gash.router.server.queue.PerChannelGlobalCommandQueue;
+import gash.router.server.queue.PerChannelWorkQueue;
 import global.Global;
 import pipe.common.Common;
 import pipe.work.Work;
@@ -18,10 +17,8 @@ import routing.Pipe;
  */
 public class Ping extends Resource {
 
-    ChannelQueue sq;
-
     public Ping(ChannelQueue sq){
-        this.sq = sq;
+        super(sq);
     }
 
     public void handleGlobalCommand(Global.GlobalCommandMessage msg) {
@@ -195,7 +192,9 @@ public class Ping extends Resource {
                 logger.info("No outbound edges to forward. To be handled");
             }
         }
+
     }
 
- 
+
+
 }

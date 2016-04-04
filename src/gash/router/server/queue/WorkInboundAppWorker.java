@@ -13,36 +13,30 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package gash.router.server.queue.global;
+package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
-import gash.router.server.MessageServer;
-import gash.router.server.edges.EdgeInfo;
-import gash.router.server.queue.command.PerChannelCommandQueue;
-import gash.router.server.queue.work.PerChannelWorkQueue;
+import gash.router.server.resources.Failure;
 import gash.router.server.resources.Ping;
-import gash.router.server.resources.Query;
-import global.Global;
+import gash.router.server.resources.Task;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pipe.common.Common;
 import pipe.work.Work;
-import routing.Pipe;
 
-public class GlobalCommandInboundAppWorker extends Thread {
+public class WorkInboundAppWorker extends Thread {
 	protected static Logger logger = LoggerFactory.getLogger("server");
 
 	int workerId;
-	PerChannelGlobalCommandQueue sq;
+	PerChannelWorkQueue sq;
 	boolean forever = true;
 
-	public GlobalCommandInboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelGlobalCommandQueue sq) {
+	public WorkInboundAppWorker(ThreadGroup tgrp, int workerId, PerChannelWorkQueue sq) {
 		super(tgrp, "inboundWork-" + workerId);
 		this.workerId = workerId;
 		this.sq = sq;
 
-		if (sq.inboundWork == null)
+		if (sq.inbound == null)
 			throw new RuntimeException("connection worker detected null inboundWork queue");
 	}
 
@@ -55,32 +49,34 @@ public class GlobalCommandInboundAppWorker extends Thread {
 		}
 
 		while (true) {
-			if (!forever && sq.inboundWork.size() == 0)
+			if (!forever && sq.inbound.size() == 0)
 				break;
 
 			try {
 				// block until a message is enqueued
-				GeneratedMessage msg = sq.inboundWork.take();
+				GeneratedMessage msg = sq.inbound.take();
 
 				// process request and enqueue response
-				if(msg instanceof Global.GlobalCommandMessage){
 
-					//PrintUtil.printCommand((Pipe.CommandRequest) msg);
-					Global.GlobalCommandMessage req = ((Global.GlobalCommandMessage) msg);
+				if (msg instanceof Work.WorkRequest) {
+					Work.WorkRequest req = ((Work.WorkRequest) msg);
+					Work.Payload payload = req.getPayload();
 
-					if (req.hasPing()) {
+					//PrintUtil.printWork(req);
+					if (payload.hasBeat()) {
+						//Work.Heartbeat hb = payload.getBeat();
+						logger.info("heartbeat from " + req.getHeader().getNodeId());
+					} else if (payload.hasPing()) {
 						new Ping(sq).handle(req);
-					} else if (req.hasMessage()) {
-						logger.info(req.getMessage());
-					} else if (req.hasQuery()){
-						new Query().handle(req);
-					} else if(req.hasResponse()){
 
+					} else if (payload.hasErr()) {
+						new Failure(sq).handle(req);
+						// PrintUtil.printFailure(err);
+					} else if (payload.hasTask()) {
+						new Task(sq).handle(req);
+					} else if (payload.hasState()) {
+						Work.WorkState s = payload.getState();
 					}
-					else{
-						//todo
-					}
-
 				}
 			} catch (InterruptedException ie) {
 				break;
@@ -91,7 +87,7 @@ public class GlobalCommandInboundAppWorker extends Thread {
 		}
 
 		if (!forever) {
-			logger.info("Command incoming connection queue closing");
+			logger.info("Work incoming connection queue closing");
 		}
 	}
 }

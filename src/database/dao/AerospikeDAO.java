@@ -10,6 +10,8 @@ import com.aerospike.client.policy.RecordExistsAction;
 import com.aerospike.client.policy.WritePolicy;
 import database.dbconnetor.AerospikeConnector;
 import database.model.DataModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
@@ -17,6 +19,7 @@ import java.util.ArrayList;
  * Created by manthan on 4/4/16.
  */
 public class AerospikeDAO {
+    protected static Logger logger = LoggerFactory.getLogger("aerospikeDAO");
 
     public static int saveData(String collectionName, DataModel data){
         int result = 0;
@@ -32,6 +35,9 @@ public class AerospikeDAO {
 
             client.put(wPolicy, key, bin1, bin2, bin3);
         }
+        else{
+            logger.error("Connection not available");
+        }
         return result;
     }
 
@@ -45,6 +51,9 @@ public class AerospikeDAO {
             if(record != null){
                 result = new DataModel(record.getValue("name").toString(),Integer.parseInt(record.getValue("seqNumber").toString()),record.getValue("dataChunk").toString().getBytes());
             }
+        }
+        else{
+            logger.error("Connection not available");
         }
         return result;
     }
@@ -63,6 +72,9 @@ public class AerospikeDAO {
                 for(Record record : records)
                     result.add(new DataModel(record.getValue("name").toString(),Integer.parseInt(record.getValue("seqNumber").toString()),record.getValue("dataChunk").toString().getBytes()));
             }
+        }
+        else{
+            logger.error("Connection not available");
         }
         return result;
     }

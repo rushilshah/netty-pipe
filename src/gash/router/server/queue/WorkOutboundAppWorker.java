@@ -84,7 +84,7 @@ public class WorkOutboundAppWorker extends Thread {
 		}
 
 		if (!forever) {
-			logger.info("connection queue closing");
+			logger.debug("connection queue closing");
 		}
 	}
 }

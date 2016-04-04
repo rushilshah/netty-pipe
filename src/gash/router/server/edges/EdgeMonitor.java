@@ -38,6 +38,7 @@ import pipe.work.Work.WorkState;
 import gash.router.client.CommConnection;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
 	protected static Logger logger = LoggerFactory.getLogger("edge monitor");
@@ -108,7 +109,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	public void run() {
 		while (forever) {
 			try {
-				for (EdgeInfo ei : this.outboundEdges.map.values()) {
+				Iterator<EdgeInfo> edgeInfoIt = this.outboundEdges.getEdgeInfoListFromMap().iterator();
+				while(edgeInfoIt.hasNext()){
+				//for (EdgeInfo ei : this.outboundEdges.map.values()) {
+					EdgeInfo ei = edgeInfoIt.next();
 					if (ei.isActive() && ei.getChannel() != null) {
 
 						Work.WorkRequest wm = createHB(ei);
@@ -140,7 +144,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		}
 	}
 
-	public Channel channelInit(String host, int port)
+	public synchronized Channel channelInit(String host, int port)
 	{
 		try
 		{
@@ -231,8 +235,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				}
 			}
 			//TODO: Inactive edge so that whenerver edge comes up back it can serve previous queue request
-			for(EdgeInfo ei : outboundEdges.map.values()){
-				onRemove(ei);
+			Iterator<EdgeInfo> edgeInfoIt = outboundEdges.getEdgeInfoListFromMap().iterator();
+			while(edgeInfoIt.hasNext()){
+			//for(EdgeInfo ei : outboundEdges.map.values()){
+				onRemove(edgeInfoIt.next());
 			}
 			outboundEdges.clear();
 			outboundEdges = null; // for garbage collection

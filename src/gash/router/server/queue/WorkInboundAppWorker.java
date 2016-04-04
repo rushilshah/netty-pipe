@@ -19,6 +19,8 @@ import com.google.protobuf.GeneratedMessage;
 import gash.router.server.MessageServer;
 import gash.router.server.PrintUtil;
 import gash.router.server.edges.EdgeInfo;
+import gash.router.server.edges.EdgeMonitor;
+import gash.router.server.election.RaftManager;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +70,12 @@ public class WorkInboundAppWorker extends Thread {
 					//PrintUtil.printWork(req);
 					if (payload.hasBeat()) {
 						//Work.Heartbeat hb = payload.getBeat();
-						logger.debug("heartbeat from " + req.getHeader().getNodeId());
+						logger.info("heartbeat from " + req.getHeader().getNodeId());
+						EdgeMonitor emon = MessageServer.getEmon();
+						EdgeInfo ei = new EdgeInfo(req.getHeader().getNodeId(),"",req.getHeader().getSource());
+						ei.setChannel(sq.getChannel());
+						emon.addToInbound(ei);
+						RaftManager.getInstance().assessCurrentState();
 					} else if (payload.hasPing()) {
 						logger.info("ping from <node,host> : <" + req.getHeader().getNodeId() + ", " + req.getHeader().getSourceHost()+">");
 						PrintUtil.printWork(req);
@@ -136,6 +143,11 @@ public class WorkInboundAppWorker extends Thread {
 						sq.gerServerState().getTasks().addTask(t);
 					} else if (payload.hasState()) {
 						Work.WorkState s = payload.getState();
+					}
+					else if(payload.hasRaftmsg())
+					{
+						RaftManager.getInstance().processRequest((Work.WorkRequest)msg);
+						//ElectionManager.getInstance().assessCurrentState();
 					}
 				}
 			} catch (InterruptedException ie) {

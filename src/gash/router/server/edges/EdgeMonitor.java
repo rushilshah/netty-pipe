@@ -38,6 +38,7 @@ import pipe.work.Work.WorkState;
 import gash.router.client.CommConnection;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Iterator;
 
@@ -128,8 +129,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					if (ei.isActive() && ei.getChannel() != null) {
 
 						Work.WorkRequest wm = createHB(ei);
-						logger.debug("HeartBeat to: " + ei.getRef());
-
+						logger.info("HeartBeat to: " + ei.getRef());
 						ei.getChannel().writeAndFlush(wm);
 					} else {
 						// TODO create a client to the node
@@ -217,6 +217,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		return outboundEdges.map.values();
 	}
 
+
 	/**
 	 * Author : Manthan
 	 * */
@@ -264,8 +265,34 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		newOutboundEdge = null;
 	}
 
+	public synchronized void addToInbound(EdgeInfo ei) {
+		if(ei.getChannel() != null){
+			logger.info("New inbound edge from node "+ei.getRef()+" being added");
+
+			ei.setQueue(QueueFactory.getInstance(ei.getChannel(),state));
+			ei.setActive(true);
+			ei.getChannel().closeFuture().addListener(new EdgeDisconnectionListener(this,ei));
+			inboundEdges.addEdge(ei);
+			this.state.setEmon(this);
+			logger.info("New inbound edge added <id,isChannelActive> " + "<" + ei.getRef()+"," + ei.isActive()+">");
+		}
+	}
+
 	public Channel getConnection(Integer host)
 	{
 		return outboundEdges.getNode(host).getChannel();
+	}
+
+	public Collection<Channel> getAllChannel(){
+		HashSet<Channel> channelList = new HashSet<>();
+		for(EdgeInfo ei : outboundEdges.getEdgeInfoListFromMap()){
+			if(ei.isActive() && ei.getChannel().isOpen())
+			channelList.add(ei.getChannel());
+		}
+		for(EdgeInfo ei : inboundEdges.getEdgeInfoListFromMap()){
+			if(ei.isActive() && ei.getChannel().isOpen())
+			channelList.add(ei.getChannel());
+		}
+		return channelList;
 	}
 }

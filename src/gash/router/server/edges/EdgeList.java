@@ -88,4 +88,8 @@ public class EdgeList {
 	public synchronized HashSet<EdgeInfo> getEdgeInfoListFromMap(){
 		return new HashSet<EdgeInfo>(map.values());
 	}
+
+	public synchronized void addEdge(EdgeInfo ei){
+		map.put(ei.getRef(),ei);
+	}
 }

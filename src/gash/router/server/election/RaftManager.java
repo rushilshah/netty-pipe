@@ -3,6 +3,7 @@ package gash.router.server.election;
 import gash.router.container.ClusterConfList;
 import gash.router.container.RoutingConf;
 import gash.router.server.CommandInit;
+import gash.router.server.MessageServer;
 import gash.router.server.ServerState;
 import gash.router.server.edges.EdgeInfo;
 import gash.router.server.edges.EdgeMonitor;
@@ -64,12 +65,17 @@ public class RaftManager implements ElectionListener{
         Work.WorkRequest rtn = electionInstance().process(msg);
         if (rtn != null)
         {
-            for(EdgeInfo ei : EdgeMonitor.getInstance().getOutboundEdgeInfoList())
+           /* for(EdgeInfo ei : EdgeMonitor.getInstance().getOutboundEdgeInfoList())
             {
                 if(ei.isActive() && ei.getChannel() != null)
                 {
                     ei.getChannel().writeAndFlush(rtn);
                 }
+            }*/
+            for(Channel ch : MessageServer.getEmon().getAllChannel())
+            {
+                if(ch!=null)
+                    ch.writeAndFlush(rtn);
             }
         }
     }
@@ -158,12 +164,10 @@ public class RaftManager implements ElectionListener{
     }
 
     private void writeAndFlush(Work.WorkRequest msg) {
-        for(EdgeInfo ei : EdgeMonitor.getInstance().getOutboundEdgeInfoList())
+        for(Channel ch : MessageServer.getEmon().getAllChannel())
         {
-            if(ei.isActive() && ei.getChannel() != null)
-            {
-                ei.getChannel().writeAndFlush(msg);
-            }
+            if(ch != null)
+            ch.writeAndFlush(msg);
         }
     }
 

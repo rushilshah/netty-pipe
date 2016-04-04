@@ -16,7 +16,7 @@ PROTOC_HOME=/home/pranav/protobuf-2.6.1
 
 if [ -d ${project_base}/generated ]; then
   echo "removing contents of ${project_base}/generated"
-  rm -r ${project_base}/generated/
+  rm -r ${project_base}/generated/*
 else
   echo "creating directory ${project_base}/generated"
   mkdir ${project_base}/generated
@@ -26,5 +26,6 @@ fi
 $PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/common.proto
 $PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/election.proto
 $PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/work.proto
-
+$PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/storage.proto
+$PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/global.proto
 $PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/pipe.proto

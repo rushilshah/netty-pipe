@@ -15,10 +15,13 @@
  */
 package gash.router.server;
 
+import gash.router.server.resources.Query;
+import global.Global;
 import pipe.common.Common.Failure;
 import pipe.common.Common.Header;
-import pipe.work.Work.WorkMessage;
-import routing.Pipe.CommandMessage;
+import pipe.work.Work;
+import routing.Pipe;
+import storage.Storage;
 
 public class PrintUtil {
 	private static final String gap = "   ";
@@ -36,7 +39,27 @@ public class PrintUtil {
 
 	}
 
-	public static void printCommand(CommandMessage msg) {
+	public static void printCommand(Pipe.CommandRequest msg) {
+		PrintUtil.printHeader(msg.getHeader());
+
+		Pipe.Payload py = msg.getPayload();
+
+		System.out.print("\nCommand: ");
+		if (py.hasErr()) {
+			System.out.println("Failure");
+			System.out.println(PrintUtil.gap + "Code:    " + py.getErr().getId());
+			System.out.println(PrintUtil.gap + "Ref ID:  " + py.getErr().getRefId());
+			System.out.println(PrintUtil.gap + "Message: " + py.getErr().getMessage());
+		} else if (py.hasPing())
+			System.out.println("Ping");
+		else if (py.hasMessage()) {
+			System.out.println("Message");
+			System.out.println(PrintUtil.gap + "Msg:  " + py.getMessage());
+		} else
+			System.out.println("Unknown");
+	}
+
+	public static void printGlobalCommand(Global.GlobalCommandMessage msg) {
 		PrintUtil.printHeader(msg.getHeader());
 
 		System.out.print("\nCommand: ");
@@ -50,17 +73,39 @@ public class PrintUtil {
 		else if (msg.hasMessage()) {
 			System.out.println("Message");
 			System.out.println(PrintUtil.gap + "Msg:  " + msg.getMessage());
-		} else
+		} else if(msg.hasQuery()){
+			printQuery(msg.getQuery());
+		}else{
 			System.out.println("Unknown");
+		}
 	}
 
-	public static void printWork(WorkMessage msg) {
+	public static void printQuery(Storage.Query query){
+		System.out.println("Query");
+		switch(query.getAction()){
+			case GET:
+				System.out.println(PrintUtil.gap + "Search File:  " + query.getKey());
+				break;
+			case STORE:
+				System.out.println(PrintUtil.gap + " File to Store:  " + query.getKey());
+				System.out.println(PrintUtil.gap + " Sequence:  " + query.getSequenceNo());
+				break;
+			case UPDATE:
+				break;
+			case DELETE:
+				break;
+		}
+
+	}
+
+	public static void printWork(Work.WorkRequest msg) {
 		PrintUtil.printHeader(msg.getHeader());
 
+		Work.Payload payload = msg.getPayload();
 		System.out.print("\nWork: ");
-		if (msg.hasErr())
+		if (payload.hasErr())
 			System.out.println("Failure");
-		else if (msg.hasPing())
+		else if (payload.hasPing())
 			System.out.println("Ping");
 		else
 			System.out.println("Unknown");

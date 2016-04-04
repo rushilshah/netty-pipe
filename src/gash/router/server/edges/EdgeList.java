@@ -16,6 +16,7 @@
 package gash.router.server.edges;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class EdgeList {
 	protected HashMap<Integer, EdgeInfo> map = new HashMap<Integer, EdgeInfo>();
@@ -24,14 +25,14 @@ public class EdgeList {
 
 	}
 
-	public EdgeInfo createIfNew(int ref, String host, int port) {
+	public synchronized EdgeInfo createIfNew(int ref, String host, int port) {
 		if (hasNode(ref))
 			return getNode(ref);
 		else
 			return addNode(ref, host, port);
 	}
 
-	public EdgeInfo addNode(int ref, String host, int port) {
+	public synchronized EdgeInfo addNode(int ref, String host, int port) {
 		if (!verify(ref, host, port)) {
 			// TODO log error
 			throw new RuntimeException("Invalid node info");
@@ -57,15 +58,15 @@ public class EdgeList {
 
 	}
 
-	public EdgeInfo getNode(int ref) {
+	public synchronized EdgeInfo getNode(int ref) {
 		return map.get(ref);
 	}
 
-	public void removeNode(int ref) {
+	public synchronized void removeNode(int ref) {
 			map.remove(ref);
 	}
 
-	public void clear() {
+	public synchronized void clear() {
 		map.clear();
 	}
 
@@ -73,7 +74,7 @@ public class EdgeList {
 	 * Author : Manthan
 	 *
 	 **/
-	public EdgeInfo returnAndRemoveIfNotNew(int ref, String host, int port) {
+	public synchronized EdgeInfo returnAndRemoveIfNotNew(int ref, String host, int port) {
 		if (hasNode(ref)) {
 			EdgeInfo ei = getNode(ref);
 			removeNode(ei.getRef());
@@ -82,5 +83,9 @@ public class EdgeList {
 		else {
 			return null;
 		}
+	}
+
+	public synchronized HashSet<EdgeInfo> getEdgeInfoListFromMap(){
+		return new HashSet<EdgeInfo>(map.values());
 	}
 }

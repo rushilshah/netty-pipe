@@ -1,5 +1,6 @@
 package gash.router.client;
 
+import global.Global;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -9,7 +10,8 @@ import io.netty.handler.codec.compression.ZlibCodecFactory;
 import io.netty.handler.codec.compression.ZlibWrapper;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
-import routing.Pipe.CommandMessage;
+import pipe.work.Work;
+import routing.Pipe;
 
 public class CommInit extends ChannelInitializer<SocketChannel> {
 	boolean compress = false;
@@ -39,7 +41,7 @@ public class CommInit extends ChannelInitializer<SocketChannel> {
 		pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(67108864, 0, 4, 0, 4));
 
 		// decoder must be first
-		pipeline.addLast("protobufDecoder", new ProtobufDecoder(CommandMessage.getDefaultInstance()));
+		pipeline.addLast("protobufDecoder", new ProtobufDecoder(Global.GlobalCommandMessage.getDefaultInstance()));
 		pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
 		pipeline.addLast("protobufEncoder", new ProtobufEncoder());
 

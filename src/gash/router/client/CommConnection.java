@@ -18,6 +18,7 @@ package gash.router.client;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicReference;
 
+import global.Global;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import routing.Pipe.CommandMessage;
+import routing.Pipe;
 
 /**
  * provides an abstraction of the communication to the remote server.
@@ -51,7 +52,7 @@ public class CommConnection {
 	private EventLoopGroup group;
 
 	// our surge protection using a in-memory cache for messages
-	LinkedBlockingDeque<CommandMessage> outbound;
+	LinkedBlockingDeque<Global.GlobalCommandMessage> outbound;
 
 	// message processing is delegated to a threading model
 	private CommWorker worker;
@@ -98,7 +99,7 @@ public class CommConnection {
 	 *            The request
 	 * @exception An exception is raised if the message cannot be enqueued.
 	 */
-	public void enqueue(CommandMessage req) throws Exception {
+	public void enqueue(Global.GlobalCommandMessage req) throws Exception {
 		// enqueue message
 		outbound.put(req);
 	}
@@ -113,7 +114,7 @@ public class CommConnection {
 	 * @param msg
 	 * @return
 	 */
-	public boolean write(CommandMessage msg) {
+	public boolean write(Global.GlobalCommandMessage msg) {
 		if (msg == null)
 			return false;
 		else if (channel == null)
@@ -145,11 +146,11 @@ public class CommConnection {
 		System.out.println("--> initializing connection to " + host + ":" + port);
 
 		// the queue to support client-side surging
-		outbound = new LinkedBlockingDeque<CommandMessage>();
+		outbound = new LinkedBlockingDeque<Global.GlobalCommandMessage>();
 
 		group = new NioEventLoopGroup();
 		try {
-			CommandInit si = new CommandInit(null, false);
+			CommInit si = new CommInit(false);
 			Bootstrap b = new Bootstrap();
 			b.group(group).channel(NioSocketChannel.class).handler(si);
 			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);

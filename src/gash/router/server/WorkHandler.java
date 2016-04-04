@@ -17,17 +17,24 @@ package gash.router.server;
 
 import gash.router.server.election.ElectionManager;
 import gash.router.server.election.RaftManager;
+import gash.router.server.queue.ChannelQueue;
+import gash.router.server.queue.QueueFactory;
+import io.netty.channel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+import gash.router.server.edges.EdgeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import pipe.common.Common;
+
 import pipe.common.Common.Failure;
-import pipe.work.Work.Heartbeat;
-import pipe.work.Work.Task;
-import pipe.work.Work.WorkMessage;
-import pipe.work.Work.WorkState;
+import pipe.work.Work;
 
 /**
  * The message handler processes json messages that are delimited by a 'newline'
@@ -37,10 +44,11 @@ import pipe.work.Work.WorkState;
  * @author gash
  * 
  */
-public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
+public class WorkHandler extends SimpleChannelInboundHandler<Work.WorkRequest> {
 	protected static Logger logger = LoggerFactory.getLogger("work");
 	protected ServerState state;
 	protected boolean debug = false;
+	private ChannelQueue queue;
 
 	public WorkHandler(ServerState state) {
 		if (state != null) {
@@ -53,51 +61,27 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	 * 
 	 * @param msg
 	 */
-	public void handleMessage(WorkMessage msg, Channel channel) {
+	public void handleMessage(Work.WorkRequest msg, Channel channel) {
 		if (msg == null) {
 			// TODO add logging
-			System.out.println("ERROR: Unexpected content - " + msg);
+			logger.error("ERROR: Unexpected content - " + msg);
 			return;
 		}
 
 		if (debug)
-			PrintUtil.printWork(msg);
+
 
 		// TODO How can you implement this without if-else statements?
 		try {
-			if (msg.hasBeat()) {
-				Heartbeat hb = msg.getBeat();
-				ElectionManager.getInstance().assessCurrentState();
-				logger.info("heartbeat from " + msg.getHeader().getNodeId());
-			} else if (msg.hasPing()) {
-				logger.info("ping from " + msg.getHeader().getNodeId());
-				System.out.println("ping from " + msg.getHeader().getNodeId() + " host: " + msg.getHeader().getSourceHost());
-				boolean p = msg.getPing();
-				WorkMessage.Builder rb = WorkMessage.newBuilder();
-				rb.setPing(true);
-				channel.write(rb.build());
-			} else if (msg.hasErr()) {
-				Failure err = msg.getErr();
-				logger.error("failure from " + msg.getHeader().getNodeId());
-				// PrintUtil.printFailure(err);
-			} else if (msg.hasTask()) {
-				Task t = msg.getTask();
-			} else if (msg.hasState()) {
-				WorkState s = msg.getState();
-			}
-			else if(msg.hasRaftmsg())
-			{
-				RaftManager.getInstance().processRequest(msg);
-				//ElectionManager.getInstance().assessCurrentState();
-			}
+
 		} catch (Exception e) {
 			// TODO add logging
 			Failure.Builder eb = Failure.newBuilder();
 			eb.setId(state.getConf().getNodeId());
 			eb.setRefId(msg.getHeader().getNodeId());
 			eb.setMessage(e.getMessage());
-			WorkMessage.Builder rb = WorkMessage.newBuilder(msg);
-			rb.setErr(eb);
+			Work.WorkRequest.Builder rb = Work.WorkRequest.newBuilder(msg);
+			rb.setPayload(Work.Payload.newBuilder().setErr(eb));
 			channel.write(rb.build());
 		}
 
@@ -116,8 +100,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	 *            The message
 	 */
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, WorkMessage msg) throws Exception {
-		handleMessage(msg, ctx.channel());
+	protected void channelRead0(ChannelHandlerContext ctx, Work.WorkRequest msg) throws Exception {
+		//handleMessage(msg, ctx.channel());
+		queueInstance(ctx.channel(),state).enqueueRequest(msg,ctx.channel());
 	}
 
 	@Override
@@ -125,5 +110,45 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		logger.error("Unexpected exception from downstream.", cause);
 		ctx.close();
 	}
+
+	/**
+	 * Isolate how the server finds the queue. Note this cannot return null.
+	 *
+	 * @param channel
+	 * @return
+	 */
+	private ChannelQueue queueInstance(Channel channel, ServerState state) {
+		// if a single queue is needed, this is where we would obtain a
+		// handle to it.
+
+		if (queue != null)
+			return queue;
+		else {
+			queue = QueueFactory.getInstance(channel,state);
+
+			// on close remove from queue
+			channel.closeFuture().addListener(new ConnectionCloseListener(queue));
+		}
+
+		return queue;
+	}
+
+	public static class ConnectionCloseListener implements ChannelFutureListener {
+
+		ChannelQueue inQueue;
+
+		public ConnectionCloseListener(ChannelQueue queue){
+			inQueue = queue;
+		}
+
+		@Override
+		public void operationComplete(ChannelFuture channelFuture) throws Exception {
+
+			if(inQueue!=null)
+				inQueue.shutdown(false);
+			inQueue = null;
+		}
+	}
+
 
 }

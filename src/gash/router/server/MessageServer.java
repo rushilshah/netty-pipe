@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import gash.router.server.election.ElectionManager;
 import gash.router.server.election.RaftManager;
+import io.netty.channel.ChannelFutureListener;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -213,7 +214,7 @@ public class MessageServer implements RoutingConfSubject{//}, Runnable{
 				// b.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR);
 
 				boolean compressComm = false;
-				b.childHandler(new CommandInit(conf, compressComm));
+				b.childHandler(new GlobalCommandInit(conf, compressComm));
 
 				// Start the server.
 				logger.info("Starting command server (" + conf.getNodeId() + "), listening on port = "
@@ -320,7 +321,9 @@ public class MessageServer implements RoutingConfSubject{//}, Runnable{
 		 */
 		@Override
 		public void updateRoutingConf(RoutingConf newConf){
+
 			state.updateRoutingConf(newConf);
+			MessageServer.setEmon(state.getEmon());
 		}
 	}
 
@@ -439,4 +442,13 @@ public class MessageServer implements RoutingConfSubject{//}, Runnable{
 		return emon;
 	}
 
+	/**
+	 * updates the object of EdgeMonitor
+	 *
+	 * @author Manthan
+	 *
+	 */
+	public static void setEmon(EdgeMonitor newEmon){
+		emon = newEmon;
+	}
 }

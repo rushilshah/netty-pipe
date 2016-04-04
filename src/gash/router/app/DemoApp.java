@@ -15,10 +15,11 @@
  */
 package gash.router.app;
 
+
 import gash.router.client.CommConnection;
 import gash.router.client.CommListener;
 import gash.router.client.MessageClient;
-import routing.Pipe.CommandMessage;
+import routing.Pipe;
 
 public class DemoApp implements CommListener {
 	private MessageClient mc;
@@ -50,13 +51,35 @@ public class DemoApp implements CommListener {
 		System.out.println("");
 	}
 
+	private void message(String message) {
+		long st = System.currentTimeMillis(), ft = 0,dt = 0;
+			mc.message(message);
+			ft = System.currentTimeMillis();
+			dt = ft - st;
+			st = ft;
+
+		System.out.println("Round-trip message times (msec)");
+		System.out.println(dt);
+	}
+
+	private void save(String value) {
+		long st = System.currentTimeMillis(), ft = 0,dt = 0;
+		mc.save(value);
+		ft = System.currentTimeMillis();
+		dt = ft - st;
+		st = ft;
+
+		System.out.println("Round-trip message times (msec)");
+		System.out.println(dt);
+	}
+
 	@Override
 	public String getListenerID() {
 		return "demo";
 	}
 
 	@Override
-	public void onMessage(CommandMessage msg) {
+	public void onMessage(Pipe.CommandRequest msg) {
 		System.out.println("---> " + msg);
 	}
 
@@ -74,7 +97,11 @@ public class DemoApp implements CommListener {
 			DemoApp da = new DemoApp(mc);
 
 			// do stuff w/ the connection
-			da.ping(2);
+			da.ping(20);
+
+			da.message("Hello System!!");
+
+			da.save("/Users//rushil/Downloads/work-stealing2.pdf");
 
 			System.out.println("\n** exiting in 10 seconds. **");
 			System.out.flush();

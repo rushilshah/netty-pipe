@@ -3,7 +3,6 @@ package gash.router.server.resources;
 import com.google.protobuf.ByteString;
 import database.dao.MongoDAO;
 import database.model.DataModel;
-import database.model.MongoDataModel;
 import gash.router.server.PrintUtil;
 import gash.router.server.queue.ChannelQueue;
 import gash.router.server.queue.PerChannelGlobalCommandQueue;
@@ -35,8 +34,8 @@ public class Query extends Resource {
             switch (query.getAction()) {
                 case GET:
                     PrintUtil.printGlobalCommand(msg);
-                    /*ArrayList<MongoDataModel> arrRespData = MongoDAO.getData("temp",new MongoDataModel(query.getKey(),null));
-                    for(MongoDataModel dataModel : arrRespData){
+                    /*ArrayList<DataModel> arrRespData = MongoDAO.getData("temp",new DataModel(query.getKey(),null));
+                    for(DataModel dataModel : arrRespData){
                         Storage.Response.Builder rb = Storage.Response.newBuilder();
                         rb.setAction(Storage.Action.GET);
                         rb.setSuccess(true);
@@ -46,7 +45,7 @@ public class Query extends Resource {
                     }*/
                     break;
                 case STORE:
-                    /*int result = MongoDAO.saveData("temp",new MongoDataModel(query.getKey(),query.getSequenceNo(),query.getData().toByteArray()));
+                    /*int result = MongoDAO.saveData("temp",new DataModel(query.getKey(),query.getSequenceNo(),query.getData().toByteArray()));
                     Storage.Response.Builder rb = Storage.Response.newBuilder();
                     rb.setAction(Storage.Action.GET);
                     rb.setSuccess(result>0);*/

@@ -15,8 +15,10 @@
  */
 package gash.router.client;
 
+import global.Global;
 import pipe.common.Common.Header;
 import routing.Pipe;
+import storage.Storage;
 
 /**
  * front-end (proxy) to our service - functional-based
@@ -42,20 +44,11 @@ public class MessageClient {
 
 	public void ping() {
 		// construct the message to send
-		Header.Builder hb = Header.newBuilder();
-		hb.setNodeId(999);
-		hb.setTime(System.currentTimeMillis());
-		hb.setDestination(6);
+		Header.Builder hb = createHeader(999,6,"999","4668");
 
-		hb.setSourceHost("999");
-		hb.setDestinationHost("4668");
-		
-
-		Pipe.CommandRequest.Builder rb = Pipe.CommandRequest.newBuilder();
+		Global.GlobalCommandMessage.Builder rb = Global.GlobalCommandMessage.newBuilder();
 		rb.setHeader(hb);
-		Pipe.Payload.Builder pb = Pipe.Payload.newBuilder();
-		pb.setPing(true);
-		rb.setPayload(pb);
+		rb.setPing(true);
 
 		try {
 			// direct no queue
@@ -67,6 +60,49 @@ public class MessageClient {
 			e.printStackTrace();
 		}
 	}
+
+	public void message(String message) {
+		// construct the message to send
+		Header.Builder hb = createHeader(999,5,"999","4668");
+
+		Global.GlobalCommandMessage.Builder rb = Global.GlobalCommandMessage.newBuilder();
+		rb.setHeader(hb);
+		rb.setMessage(message);
+
+		try {
+			// direct no queue
+			// CommConnection.getInstance().write(rb.build());
+			// using queue
+			CommConnection.getInstance().enqueue(rb.build());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void query(String value) {
+		// construct the message to send
+		Header.Builder hb = createHeader(999,5,"999","4668");
+
+		Storage.Query.Builder qb = Storage.Query.newBuilder();
+		qb.setAction(Storage.Action.GET);
+		qb.setKey(value);
+
+		Global.GlobalCommandMessage.Builder rb = Global.GlobalCommandMessage.newBuilder();
+		rb.setHeader(hb);
+		rb.setQuery(qb);
+
+		try {
+			// direct no queue
+			// CommConnection.getInstance().write(rb.build());
+			// using queue
+			CommConnection.getInstance().enqueue(rb.build());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+
 
 	public void release() {
 		CommConnection.getInstance().release();
@@ -80,5 +116,17 @@ public class MessageClient {
 	 */
 	private synchronized long nextId() {
 		return ++curID;
+	}
+
+	public static Header.Builder createHeader(int nodeID,int destination,String sourceHost, String destinationHost){
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(nodeID);
+		hb.setTime(System.currentTimeMillis());
+		hb.setDestination(destination);
+
+		hb.setSourceHost(sourceHost);
+		hb.setDestinationHost(destinationHost);
+
+		return hb;
 	}
 }

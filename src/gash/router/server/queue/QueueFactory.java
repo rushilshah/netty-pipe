@@ -47,7 +47,7 @@ public class QueueFactory {
 		if (channel == null)
 			queue = new NoOpWorkQueue();
 		else {
-			queue = new PerChannelCommandQueue(channel,conf);
+			queue = new PerChannelGlobalCommandQueue(channel,conf);
 		}
 
 		// on close remove from queue

@@ -55,6 +55,6 @@ public class GlobalCommandInit extends ChannelInitializer<SocketChannel> {
 
 
 		// our server processor (new instance for each connection)
-		pipeline.addLast("handler", new CommandHandler(conf));
+		pipeline.addLast("handler", new GlobalCommandHandler(conf));
 	}
 }

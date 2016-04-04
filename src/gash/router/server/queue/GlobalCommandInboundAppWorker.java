@@ -16,12 +16,18 @@
 package gash.router.server.queue;
 
 import com.google.protobuf.GeneratedMessage;
+import gash.router.server.MessageServer;
+import gash.router.server.PrintUtil;
+import gash.router.server.edges.EdgeInfo;
 import gash.router.server.resources.Ping;
 import gash.router.server.resources.Query;
 import global.Global;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pipe.common.Common;
+import pipe.work.Work;
+import routing.Pipe;
 
 public class GlobalCommandInboundAppWorker extends Thread {
 	protected static Logger logger = LoggerFactory.getLogger("server");
@@ -54,6 +60,7 @@ public class GlobalCommandInboundAppWorker extends Thread {
 			try {
 				// block until a message is enqueued
 				GeneratedMessage msg = sq.inboundWork.take();
+				boolean msgDropFlag;
 
 				// process request and enqueue response
 				if(msg instanceof Global.GlobalCommandMessage){
@@ -62,16 +69,46 @@ public class GlobalCommandInboundAppWorker extends Thread {
 					Global.GlobalCommandMessage req = ((Global.GlobalCommandMessage) msg);
 
 					if (req.hasPing()) {
-						new Ping(sq).handle(req);
-					} else if (req.hasMessage()) {
-						logger.info(req.getMessage());
-					} else if (req.hasQuery()){
-						new Query(sq).handle(req);
-					} else if(req.hasResponse()){
+						logger.info("ping from " + req.getHeader().getNodeId());
+						if (req.getHeader().getDestination() == sq.getRoutingConf().getNodeId()) {
+							//handle message by self
+							logger.info("Message for me: " + req.getMessage() + " from " + req.getHeader().getSourceHost());
+						} else { //message doesn't belong to current node. Forward on other edges
+							msgDropFlag = true;
+							PrintUtil.printGlobalCommand((Global.GlobalCommandMessage) msg);
+							if (MessageServer.getEmon() != null) {// forward if Comm-worker port is active
+								for (EdgeInfo ei : MessageServer.getEmon().getOutboundEdgeInfoList()) {
+									if (ei.isActive() && ei.getChannel() != null) {// check if channel of outboundWork edge is active
+										Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
 
-					}
-					else{
-						//todo
+										Common.Header.Builder hb = Common.Header.newBuilder();
+										hb.setNodeId(sq.getRoutingConf().getNodeId());
+										hb.setTime(req.getHeader().getTime());
+										hb.setDestination(req.getHeader().getDestination());
+										hb.setSourceHost(sq.getRoutingConf().getNodeId() + "_" + req.getHeader().getSourceHost());
+										hb.setDestinationHost(req.getHeader().getDestinationHost());
+										hb.setMaxHops(5);
+
+										wb.setHeader(hb);
+										wb.setSecret(1234567809);
+										wb.setPayload(Work.Payload.newBuilder().setPing(true));
+
+										Work.WorkRequest work = wb.build();
+
+										PerChannelWorkQueue edgeQueue = (PerChannelWorkQueue) ei.getQueue();
+										edgeQueue.enqueueResponse(work, ei.getChannel());
+										msgDropFlag = false;
+										logger.info("Workmessage queued");
+									}
+								}
+								if (msgDropFlag)
+									logger.info("Message dropped <node,ping,destination>: <" + req.getHeader().getNodeId() + "," + req.getPing() + "," + req.getHeader().getDestination() + ">");
+							} else {// drop the message or queue it for limited time to send to connected node
+								//todo
+								logger.info("No outbound edges to forward. To be handled");
+							}
+
+						}
 					}
 
 				}

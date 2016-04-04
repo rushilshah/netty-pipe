@@ -1,7 +1,10 @@
 package gash.router.server.resources;
 
+import com.google.protobuf.ByteString;
 import database.dao.MongoDAO;
 import database.model.DataModel;
+import database.model.MongoDataModel;
+import gash.router.server.PrintUtil;
 import gash.router.server.queue.ChannelQueue;
 import gash.router.server.queue.PerChannelGlobalCommandQueue;
 import global.Global;
@@ -26,15 +29,28 @@ public class Query extends Resource {
     public void handleGlobalCommand(Global.GlobalCommandMessage msg) {
 
         query = msg.getQuery();
+        //If this have to handle on the same node
+        //TODO: change the logic so that it has to be dependent on configuration and intra cluster node space dependent.
         if (msg.getHeader().getDestination() == ((PerChannelGlobalCommandQueue) sq).getRoutingConf().getNodeId()) {
             switch (query.getAction()) {
                 case GET:
-                    ArrayList<DataModel> arrRespData = MongoDAO.getData("temp",new DataModel(query.getKey(),null));
-                    for(int i=0;i<arrRespData.size();i++){
-
-                    }
+                    PrintUtil.printGlobalCommand(msg);
+                    /*ArrayList<MongoDataModel> arrRespData = MongoDAO.getData("temp",new MongoDataModel(query.getKey(),null));
+                    for(MongoDataModel dataModel : arrRespData){
+                        Storage.Response.Builder rb = Storage.Response.newBuilder();
+                        rb.setAction(Storage.Action.GET);
+                        rb.setSuccess(true);
+                        rb.setKey(dataModel.getName());
+                        rb.setSequenceNo(dataModel.getSeqNumber());
+                        rb.setData(ByteString.copyFrom(dataModel.getDataChunk()));
+                    }*/
                     break;
                 case STORE:
+                    /*int result = MongoDAO.saveData("temp",new MongoDataModel(query.getKey(),query.getSequenceNo(),query.getData().toByteArray()));
+                    Storage.Response.Builder rb = Storage.Response.newBuilder();
+                    rb.setAction(Storage.Action.GET);
+                    rb.setSuccess(result>0);*/
+                    PrintUtil.printGlobalCommand(msg);
                     break;
                 case UPDATE:
                 case DELETE:

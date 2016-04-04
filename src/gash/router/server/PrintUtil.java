@@ -15,11 +15,13 @@
  */
 package gash.router.server;
 
+import gash.router.server.resources.Query;
 import global.Global;
 import pipe.common.Common.Failure;
 import pipe.common.Common.Header;
 import pipe.work.Work;
 import routing.Pipe;
+import storage.Storage;
 
 public class PrintUtil {
 	private static final String gap = "   ";
@@ -71,8 +73,29 @@ public class PrintUtil {
 		else if (msg.hasMessage()) {
 			System.out.println("Message");
 			System.out.println(PrintUtil.gap + "Msg:  " + msg.getMessage());
-		} else
+		} else if(msg.hasQuery()){
+			printQuery(msg.getQuery());
+		}else{
 			System.out.println("Unknown");
+		}
+	}
+
+	public static void printQuery(Storage.Query query){
+		System.out.println("Query");
+		switch(query.getAction()){
+			case GET:
+				System.out.println(PrintUtil.gap + "Search File:  " + query.getKey());
+				break;
+			case STORE:
+				System.out.println(PrintUtil.gap + " File to Store:  " + query.getKey());
+				System.out.println(PrintUtil.gap + " Sequence:  " + query.getSequenceNo());
+				break;
+			case UPDATE:
+				break;
+			case DELETE:
+				break;
+		}
+
 	}
 
 	public static void printWork(Work.WorkRequest msg) {

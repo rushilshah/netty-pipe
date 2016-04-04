@@ -1,7 +1,7 @@
 package gash.router.server.resources;
 
 import database.dao.MongoDAO;
-import database.model.MongoDataModel;
+import database.model.DataModel;
 import gash.router.server.queue.ChannelQueue;
 import gash.router.server.queue.PerChannelGlobalCommandQueue;
 import global.Global;
@@ -29,7 +29,7 @@ public class Query extends Resource {
         if (msg.getHeader().getDestination() == ((PerChannelGlobalCommandQueue) sq).getRoutingConf().getNodeId()) {
             switch (query.getAction()) {
                 case GET:
-                    ArrayList<MongoDataModel> arrRespData = MongoDAO.getData("temp",new MongoDataModel(query.getKey(),null));
+                    ArrayList<DataModel> arrRespData = MongoDAO.getData("temp",new DataModel(query.getKey(),null));
                     for(int i=0;i<arrRespData.size();i++){
 
                     }

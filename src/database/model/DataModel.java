@@ -5,20 +5,23 @@ package database.model;
  */
 public class DataModel {
     String name;
-    String seqNumber;
+    int seqNumber;
     byte[] dataChunk;
+    int seqSize;
 
 
     public DataModel(String name, byte[] dataChunk){
         this.name = name;
-        this.seqNumber = "";
+        this.seqNumber = -1;
         this.dataChunk = dataChunk;
+        this.seqSize=0;
     }
 
-    public DataModel(String name, String seqNumber, byte[] dataChunk){
+    public DataModel(String name, int seqNumber, byte[] dataChunk){
         this.name = name;
         this.seqNumber = seqNumber;
         this.dataChunk = dataChunk;
+        this.seqSize=0;
     }
 
     public String getName() {
@@ -29,11 +32,11 @@ public class DataModel {
         this.name = name;
     }
 
-    public String getSeqNumber() {
+    public int getSeqNumber() {
         return seqNumber;
     }
 
-    public void setSeqNumber(String seqNumber) {
+    public void setSeqNumber(int seqNumber) {
         this.seqNumber = seqNumber;
     }
 
@@ -43,5 +46,13 @@ public class DataModel {
 
     public void setDataChunk(byte[] dataChunk) {
         this.dataChunk = dataChunk;
+    }
+
+    public int getSeqSize() {
+        return seqSize;
+    }
+
+    public void setSeqSize(int seqSize) {
+        this.seqSize = seqSize;
     }
 }

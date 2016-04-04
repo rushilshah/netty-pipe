@@ -22,7 +22,7 @@ public class AerospikeConnector {
 
     private static HashMap<DBConfigModel,AerospikeClient> connectionMap= new HashMap<>();
 
-    private static AerospikeClient getConnection(){
+    public static AerospikeClient getConnection(){
 
         AerospikeClient ac = null;
 
@@ -50,5 +50,9 @@ public class AerospikeConnector {
             }
         }
         return ac;
+    }
+
+    public static String getDatabaseName(){
+        return configProperty.getProperty("dbName");
     }
 }

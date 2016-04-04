@@ -109,6 +109,8 @@ public class GlobalCommandInboundAppWorker extends Thread {
 							}
 
 						}
+					}else if(req.hasQuery()){
+						new Query(sq).handle(req);
 					}
 
 				}

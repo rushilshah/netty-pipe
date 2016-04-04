@@ -5,16 +5,16 @@ package database.model;
  */
 public class MongoDataModel {
     String name;
-    String seqNumber;
+    int seqNumber;
     byte[] dataChunk;
 
     public MongoDataModel(String name, byte[] dataChunk){
         this.name = name;
-        this.seqNumber = "";
+        this.seqNumber = 0;
         this.dataChunk = dataChunk;
     }
 
-    public MongoDataModel(String name, String seqNumber, byte[] dataChunk){
+    public MongoDataModel(String name, int seqNumber, byte[] dataChunk){
         this.name = name;
         this.seqNumber = seqNumber;
         this.dataChunk = dataChunk;
@@ -28,11 +28,11 @@ public class MongoDataModel {
         this.name = name;
     }
 
-    public String getSeqNumber() {
+    public int getSeqNumber() {
         return seqNumber;
     }
 
-    public void setSeqNumber(String seqNumber) {
+    public void setSeqNumber(int seqNumber) {
         this.seqNumber = seqNumber;
     }
 

@@ -3,6 +3,7 @@ option java_package = "pipe.work";
 
 import "common.proto";
 import "election.proto";
+import "storage.proto";
 
 message WorkState {
     required int32 enqueued = 1;
@@ -33,6 +34,10 @@ message Payload{
     optional Task task = 6;
     optional WorkState state = 7;
     optional LeaderStatus leader = 8;
+    optional Query query = 16;
+
+    optional Response response = 17;
+
 }
 
 // These are messages to keep the network running (not to perform work)

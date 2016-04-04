@@ -15,6 +15,7 @@
  */
 package gash.router.server;
 
+import global.Global;
 import pipe.common.Common.Failure;
 import pipe.common.Common.Header;
 import pipe.work.Work;
@@ -52,6 +53,24 @@ public class PrintUtil {
 		else if (py.hasMessage()) {
 			System.out.println("Message");
 			System.out.println(PrintUtil.gap + "Msg:  " + py.getMessage());
+		} else
+			System.out.println("Unknown");
+	}
+
+	public static void printGlobalCommand(Global.GlobalCommandMessage msg) {
+		PrintUtil.printHeader(msg.getHeader());
+
+		System.out.print("\nCommand: ");
+		if (msg.hasErr()) {
+			System.out.println("Failure");
+			System.out.println(PrintUtil.gap + "Code:    " + msg.getErr().getId());
+			System.out.println(PrintUtil.gap + "Ref ID:  " + msg.getErr().getRefId());
+			System.out.println(PrintUtil.gap + "Message: " + msg.getErr().getMessage());
+		} else if (msg.hasPing())
+			System.out.println("Ping");
+		else if (msg.hasMessage()) {
+			System.out.println("Message");
+			System.out.println(PrintUtil.gap + "Msg:  " + msg.getMessage());
 		} else
 			System.out.println("Unknown");
 	}

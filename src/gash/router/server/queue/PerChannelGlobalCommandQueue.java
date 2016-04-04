@@ -39,7 +39,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  * @author gash
  * 
  */
-public class PerChannelCommandQueue implements ChannelQueue {
+public class PerChannelGlobalCommandQueue implements ChannelQueue {
 	protected static Logger logger = LoggerFactory.getLogger("PerChannelCommandQueue");
 
 	// The queues feed work to the inboundWork and outboundWork threads (workers). The
@@ -48,28 +48,28 @@ public class PerChannelCommandQueue implements ChannelQueue {
 	// threads
 	//
 	// Note these are directly accessible by the workers
-	LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> inboundWork;
-	LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> outboundWork;
+	LinkedBlockingDeque<GeneratedMessage> inboundWork;
+	LinkedBlockingDeque<GeneratedMessage> outboundWork;
 
 	Channel channel;
 	RoutingConf conf;
 
 	// This implementation uses a fixed number of threads per channel
-	private ArrayList<CommandOutboundAppWorker> oworkerList;
-	private ArrayList<CommandInboundAppWorker> iworkerList;
+	private ArrayList<GlobalCommandOutboundAppWorker> oworkerList;
+	private ArrayList<GlobalCommandInboundAppWorker> iworkerList;
 
 	// not the best method to ensure uniqueness
 	private ThreadGroup tgroup = new ThreadGroup("PerChannelQ-" + System.nanoTime());
 
-	public PerChannelCommandQueue(Channel channel, RoutingConf conf) {
+	public PerChannelGlobalCommandQueue(Channel channel, RoutingConf conf) {
 		this.channel = channel;
 		this.conf = conf;
 		init();
 	}
 
 	protected void init() {
-		inboundWork = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
-		outboundWork = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
+		inboundWork = new LinkedBlockingDeque<GeneratedMessage>();
+		outboundWork = new LinkedBlockingDeque<GeneratedMessage>();
 
 		oworkerList = new ArrayList<>(3);
 		iworkerList = new ArrayList<>(3);
@@ -78,13 +78,13 @@ public class PerChannelCommandQueue implements ChannelQueue {
 		//Creating worker threadpool
 		//Changed by: Rushil
 		for(int i=0;i<3;i++){
-			CommandInboundAppWorker tempWorker = new CommandInboundAppWorker(tgroup, i+1, this);
+			GlobalCommandInboundAppWorker tempWorker = new GlobalCommandInboundAppWorker(tgroup, i+1, this);
 			iworkerList.add(tempWorker);
 			tempWorker.start();
 		}
 
 		for(int i=0;i<3;i++){
-			CommandOutboundAppWorker tempWorker = new CommandOutboundAppWorker(tgroup, i+1, this);
+			GlobalCommandOutboundAppWorker tempWorker = new GlobalCommandOutboundAppWorker(tgroup, i+1, this);
 			oworkerList.add(tempWorker);
 			tempWorker.start();
 		}
@@ -113,7 +113,7 @@ public class PerChannelCommandQueue implements ChannelQueue {
 	}
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see poke.server.ChannelQueue#shutdown(boolean)
 	 */
 	@Override
@@ -129,7 +129,7 @@ public class PerChannelCommandQueue implements ChannelQueue {
 		}
 
 		for(int i=0;i<iworkerList.size();i++) {
-			CommandInboundAppWorker iworker = iworkerList.get(0);
+			GlobalCommandInboundAppWorker iworker = iworkerList.get(0);
 			if (iworker != null) {
 				iworker.forever = false;
 				if (iworker.getState() == State.BLOCKED || iworker.getState() == State.WAITING)
@@ -139,7 +139,7 @@ public class PerChannelCommandQueue implements ChannelQueue {
 		iworkerList.clear();
 
 		for(int i=0;i<oworkerList.size();i++) {
-			CommandOutboundAppWorker oworker = oworkerList.get(0);
+			GlobalCommandOutboundAppWorker oworker = oworkerList.get(0);
 			if (oworker != null) {
 				oworker.forever = false;
 				if (oworker.getState() == State.BLOCKED || oworker.getState() == State.WAITING)
@@ -151,7 +151,7 @@ public class PerChannelCommandQueue implements ChannelQueue {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see poke.server.ChannelQueue#enqueueRequest(eye.Comm.Finger)
 	 */
 	@Override
@@ -165,7 +165,7 @@ public class PerChannelCommandQueue implements ChannelQueue {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see poke.server.ChannelQueue#enqueueResponse(eye.Comm.Response)
 	 */
 	@Override
@@ -193,11 +193,11 @@ public class PerChannelCommandQueue implements ChannelQueue {
 		}
 	}
 
-	public LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> getInboundWork() {
+	public LinkedBlockingDeque<GeneratedMessage> getInboundWork() {
 		return inboundWork;
 	}
 
-	public LinkedBlockingDeque<com.google.protobuf.GeneratedMessage> getOutboundWork() {
+	public LinkedBlockingDeque<GeneratedMessage> getOutboundWork() {
 		return outboundWork;
 	}
 }

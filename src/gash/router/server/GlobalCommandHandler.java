@@ -15,24 +15,15 @@
  */
 package gash.router.server;
 
+import gash.router.container.RoutingConf;
 import gash.router.server.queue.ChannelQueue;
 import gash.router.server.queue.QueueFactory;
+import global.Global;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
-import gash.router.server.edges.EdgeInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import pipe.common.Common;
-
 import pipe.common.Common.Failure;
-import pipe.work.Work;
+import routing.Pipe;
 
 /**
  * The message handler processes json messages that are delimited by a 'newline'
@@ -42,49 +33,49 @@ import pipe.work.Work;
  * @author gash
  * 
  */
-public class WorkHandler extends SimpleChannelInboundHandler<Work.WorkRequest> {
-	protected static Logger logger = LoggerFactory.getLogger("work");
-	protected ServerState state;
-	protected boolean debug = false;
+public class GlobalCommandHandler extends SimpleChannelInboundHandler<Global.GlobalCommandMessage> {
+	protected static Logger logger = LoggerFactory.getLogger("cmd");
+	protected RoutingConf conf;
 	private ChannelQueue queue;
 
-	public WorkHandler(ServerState state) {
-		if (state != null) {
-			this.state = state;
+	public GlobalCommandHandler(RoutingConf conf) {
+		if (conf != null) {
+			this.conf = conf;
 		}
 	}
 
 	/**
-	 * override this method to provide processing behavior. T
+	 * override this method to provide processing behavior. This implementation
+	 * mimics the routing we see in annotating classes to support a RESTful-like
+	 * behavior (e.g., jax-rs).
 	 * 
 	 * @param msg
 	 */
-	public void handleMessage(Work.WorkRequest msg, Channel channel) {
+	public void handleMessage(Global.GlobalCommandMessage msg, Channel channel) {
 		if (msg == null) {
 			// TODO add logging
 			logger.error("ERROR: Unexpected content - " + msg);
 			return;
 		}
 
-		if (debug)
+		//PrintUtil.printCommand(msg);
 
-
-		// TODO How can you implement this without if-else statements?
 		try {
 
 		} catch (Exception e) {
 			// TODO add logging
 			Failure.Builder eb = Failure.newBuilder();
-			eb.setId(state.getConf().getNodeId());
+			eb.setId(conf.getNodeId());
 			eb.setRefId(msg.getHeader().getNodeId());
 			eb.setMessage(e.getMessage());
-			Work.WorkRequest.Builder rb = Work.WorkRequest.newBuilder(msg);
-			rb.setPayload(Work.Payload.newBuilder().setErr(eb));
+			Global.GlobalCommandMessage.Builder rb = Global.GlobalCommandMessage.newBuilder(msg);
+			Pipe.Payload.Builder pb = Pipe.Payload.newBuilder();
+			pb.setErr(eb);
+
 			channel.write(rb.build());
 		}
 
 		System.out.flush();
-
 	}
 
 	/**
@@ -98,9 +89,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<Work.WorkRequest> {
 	 *            The message
 	 */
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, Work.WorkRequest msg) throws Exception {
+	protected void channelRead0(ChannelHandlerContext ctx, Global.GlobalCommandMessage msg) throws Exception {
 		//handleMessage(msg, ctx.channel());
-		queueInstance(ctx.channel(),state).enqueueRequest(msg,ctx.channel());
+		queueInstance(ctx.channel()).enqueueRequest(msg,ctx.channel());
 	}
 
 	@Override
@@ -115,14 +106,14 @@ public class WorkHandler extends SimpleChannelInboundHandler<Work.WorkRequest> {
 	 * @param channel
 	 * @return
 	 */
-	private ChannelQueue queueInstance(Channel channel, ServerState state) {
+	private ChannelQueue queueInstance(Channel channel) {
 		// if a single queue is needed, this is where we would obtain a
 		// handle to it.
 
 		if (queue != null)
 			return queue;
 		else {
-			queue = QueueFactory.getInstance(channel,state);
+			queue = QueueFactory.getInstance(channel,conf);
 
 			// on close remove from queue
 			channel.closeFuture().addListener(new ConnectionCloseListener(queue));
@@ -147,6 +138,5 @@ public class WorkHandler extends SimpleChannelInboundHandler<Work.WorkRequest> {
 			inQueue = null;
 		}
 	}
-
 
 }

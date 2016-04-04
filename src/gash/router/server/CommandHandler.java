@@ -136,7 +136,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<Pipe.CommandRequ
 		public void operationComplete(ChannelFuture channelFuture) throws Exception {
 
 			if(inQueue!=null)
-				inQueue.shutdown(true);
+				inQueue.shutdown(false);
 			inQueue = null;
 		}
 	}

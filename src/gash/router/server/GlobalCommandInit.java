@@ -1,5 +1,6 @@
-package gash.router.client;
+package gash.router.server;
 
+import gash.router.container.RoutingConf;
 import global.Global;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -10,15 +11,21 @@ import io.netty.handler.codec.compression.ZlibCodecFactory;
 import io.netty.handler.codec.compression.ZlibWrapper;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
-import pipe.work.Work;
 import routing.Pipe;
 
-public class CommInit extends ChannelInitializer<SocketChannel> {
+/**
+ * Initializes the external interface
+ * @author gash
+ *
+ */
+public class GlobalCommandInit extends ChannelInitializer<SocketChannel> {
 	boolean compress = false;
+	RoutingConf conf;
 
-	public CommInit(boolean enableCompression) {
+	public GlobalCommandInit(RoutingConf conf, boolean enableCompression) {
 		super();
 		compress = enableCompression;
+		this.conf = conf;
 	}
 
 	@Override
@@ -39,13 +46,15 @@ public class CommInit extends ChannelInitializer<SocketChannel> {
 		 * 4 bytes
 		 */
 		pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(67108864, 0, 4, 0, 4));
+		//pipeline.addLast("ping", new IdleStateHandler(5, 5, 8, TimeUnit.SECONDS)); // Added by Pranav
 
 		// decoder must be first
 		pipeline.addLast("protobufDecoder", new ProtobufDecoder(Global.GlobalCommandMessage.getDefaultInstance()));
 		pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
 		pipeline.addLast("protobufEncoder", new ProtobufEncoder());
 
+
 		// our server processor (new instance for each connection)
-		pipeline.addLast("handler", new CommHandler());
+		pipeline.addLast("handler", new GlobalCommandHandler(conf));
 	}
 }

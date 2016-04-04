@@ -8,13 +8,13 @@ public class MongoDataModel {
     String seqNumber;
     byte[] dataChunk;
 
-    MongoDataModel(String name, byte[] dataChunk){
+    public MongoDataModel(String name, byte[] dataChunk){
         this.name = name;
         this.seqNumber = "";
         this.dataChunk = dataChunk;
     }
 
-    MongoDataModel(String name, String seqNumber, byte[] dataChunk){
+    public MongoDataModel(String name, String seqNumber, byte[] dataChunk){
         this.name = name;
         this.seqNumber = seqNumber;
         this.dataChunk = dataChunk;

@@ -26,3 +26,24 @@ message Failure {
     optional int32 ref_id = 2;
     optional string message = 3;
 }
+
+/**
+ * description of the work
+ */
+message Request {
+    required Type type = 1;
+    optional bytes file = 2;
+    optional string file_name = 3;
+    optional Update update =4;
+
+    enum Type {
+        SAVE = 1;
+        SEARCH = 2;
+        UPDATE = 3;
+    }
+}
+
+message Update {
+    required bytes file = 2;
+    required string file_name = 3;
+}

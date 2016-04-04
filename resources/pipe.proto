@@ -11,6 +11,8 @@ message Payload{
 
     optional Failure err = 3;
 
+    optional Request request = 4;
+
 }
 
 message CommandRequest {

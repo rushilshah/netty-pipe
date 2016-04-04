@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.Thread.State;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
@@ -53,8 +54,8 @@ public class PerChannelWorkQueue implements ChannelQueue {
 	ServerState state;
 
 	// This implementation uses a fixed number of threads per channel
-	private WorkOutboundAppWorker oworker;
-	private WorkInboundAppWorker iworker;
+	private ArrayList<WorkOutboundAppWorker> oworkerList;
+	private ArrayList<WorkInboundAppWorker> iworkerList;
 
 	// not the best method to ensure uniqueness
 	private ThreadGroup tgroup = new ThreadGroup("PerChannelQ-" + System.nanoTime());
@@ -66,26 +67,38 @@ public class PerChannelWorkQueue implements ChannelQueue {
 	}
 
 	protected void init() {
-		inbound = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
-		outbound = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
+		inbound = new LinkedBlockingDeque<>();
+		outbound = new LinkedBlockingDeque<>();
+
+		oworkerList = new ArrayList<>(3);
+		iworkerList = new ArrayList<>(3);
 
 		logger.info("Starting to listen to Work worker");
-		iworker = new WorkInboundAppWorker(tgroup, 1, this);
-		iworker.start();
+		//Creating worker threadpool
+		//Changed by: Rushil
+		for(int i=0;i<3;i++){
+			WorkOutboundAppWorker tempWorker = new WorkOutboundAppWorker(tgroup, i+1, this);
+			oworkerList.add(tempWorker);
+			tempWorker.start();
+		}
 
-		oworker = new WorkOutboundAppWorker(tgroup, 1, this);
-		oworker.start();
+		for(int i=0;i<3;i++){
+			WorkInboundAppWorker tempWorker = new WorkInboundAppWorker(tgroup, i+1, this);
+			iworkerList.add(tempWorker);
+			tempWorker.start();
+		}
+
 
 		// let the handler manage the queue's shutdown
 		// register listener to receive closing of channel
 		// channel.getCloseFuture().addListener(new CloseListener(this));
 	}
 
-	protected Channel getChannel() {
+	public Channel getChannel() {
 		return channel;
 	}
 
-	protected ServerState gerServerState(){
+	public ServerState gerServerState(){
 		return state;
 	}
 
@@ -105,7 +118,7 @@ public class PerChannelWorkQueue implements ChannelQueue {
              */
 	@Override
 	public void shutdown(boolean hard) {
-		logger.info("work queue server is shutting down");
+		logger.info("Work channel is shutting down");
 
 		channel = null;
 
@@ -115,19 +128,25 @@ public class PerChannelWorkQueue implements ChannelQueue {
 			outbound.clear();
 		}
 
-		if (iworker != null) {
-			iworker.forever = false;
-			if (iworker.getState() == State.BLOCKED || iworker.getState() == State.WAITING)
-				iworker.interrupt();
-			iworker = null;
+		for(int i=0;i<iworkerList.size();i++) {
+			WorkInboundAppWorker iworker = iworkerList.get(0);
+			if (iworker != null) {
+				iworker.forever = false;
+				if (iworker.getState() == State.BLOCKED || iworker.getState() == State.WAITING)
+					iworker.interrupt();
+			}
 		}
+		iworkerList.clear();
 
-		if (oworker != null) {
-			oworker.forever = false;
-			if (oworker.getState() == State.BLOCKED || oworker.getState() == State.WAITING)
-				oworker.interrupt();
-			oworker = null;
+		for(int i=0;i<oworkerList.size();i++) {
+			WorkOutboundAppWorker oworker = oworkerList.get(0);
+			if (oworker != null) {
+				oworker.forever = false;
+				if (oworker.getState() == State.BLOCKED || oworker.getState() == State.WAITING)
+					oworker.interrupt();
+			}
 		}
+		oworkerList.clear();
 
 	}
 

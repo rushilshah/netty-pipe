@@ -264,7 +264,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		newOutboundEdge = null;
 	}
 
-	public static Channel getConnection(Integer host)
+	public Channel getConnection(Integer host)
 	{
 		return outboundEdges.getNode(host).getChannel();
 	}

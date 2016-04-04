@@ -55,7 +55,7 @@ public interface Election {
      * @param req
      * @return the resulting management action (if any)
      */
-    Work.WorkMessage process(Work.WorkMessage req);
+    Work.WorkRequest process(Work.WorkRequest req);
 
     /**
      * the node ID of myself.

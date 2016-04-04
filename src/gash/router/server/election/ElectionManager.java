@@ -1,3 +1,4 @@
+/*
 package gash.router.server.election;
 
 import gash.router.container.RoutingConf;
@@ -12,9 +13,10 @@ import gash.router.server.election.RaftElection.*;
 import pipe.common.Common;
 import pipe.work.Work;
 
-/**
+*
  * Created by pranav on 4/2/16.
- */
+
+
 public class ElectionManager implements ElectionListener {
     protected static Logger logger = LoggerFactory.getLogger("election");
     protected static AtomicReference<ElectionManager> instance = new AtomicReference<ElectionManager>();
@@ -25,12 +27,14 @@ public class ElectionManager implements ElectionListener {
     // number of times we try to get the leader when a node starts up
     private int firstTime = 2;
 
-    /** The election that is in progress - only ONE! */
+* The election that is in progress - only ONE!
+
     private Election election;
     private int electionCycle = -1;
     private Integer syncPt = 1;
 
-    /** The leader */
+* The leader
+
     Integer leaderNode;
 
     public static ElectionManager initManager(RoutingConf conf) {
@@ -43,29 +47,31 @@ public class ElectionManager implements ElectionListener {
         return conf;
     }
 
-    /**
+*
      * Access a consistent instance for the life of the process.
      *
      * TODO do we need to have a singleton for this? What happens when a process
      * acts on behalf of separate interests?
      *
      * @return
-     */
+
+
     public static ElectionManager getInstance() {
         // TODO throw exception if not initialized!
         return instance.get();
     }
 
-    /**
+*
      * returns the leader of the network
      *
      * @return
-     */
+
+
     public Integer whoIsTheLeader() {
         return this.leaderNode;
     }
 
-    /**
+*
      * initiate an election from within the server - most likely scenario is the
      * heart beat manager detects a failure of the leader and calls this method.
      *
@@ -75,7 +81,8 @@ public class ElectionManager implements ElectionListener {
      * ID is not the same, the new election will supplant the current (older)
      * election. This should only be triggered from nodes that share an edge
      * with the leader.
-     */
+
+
     public void startElection() {
         electionCycle = electionInstance().createElectionID();
         ((RaftElection) election).setCurrentState(RState.Candidate);
@@ -116,9 +123,10 @@ public class ElectionManager implements ElectionListener {
         }
     }
 
-    /**
+*
      * @param args
-     */
+
+
     public void processRequest(Work.WorkMessage msg) {
 //		if (!mgmt.hasElection())
 //			return;
@@ -165,11 +173,12 @@ public class ElectionManager implements ElectionListener {
         }
     }
 
-    /**
+*
      * check the health of the leader (usually called after a HB update)
      *
      * @param mgmt
-     */
+
+
     public void assessCurrentState() {
         // logger.info("ElectionManager.assessCurrentState() checking elected leader status");
 
@@ -188,7 +197,8 @@ public class ElectionManager implements ElectionListener {
         }
     }
 
-    /** election listener implementation */
+* election listener implementation
+
     @Override
     public void concludeWith(boolean success, Integer leaderID) {
         if (success) {
@@ -232,7 +242,7 @@ public class ElectionManager implements ElectionListener {
         // now send it to the requester
         logger.info("Election started by node " + conf.getNodeId());
         try {
-            EdgeMonitor.getConnection(msg.getHeader().getNodeId()).writeAndFlush(wb.build());
+           // EdgeMonitor.getConnection(msg.getHeader().getNodeId()).writeAndFlush(wb.build());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -301,3 +311,4 @@ public class ElectionManager implements ElectionListener {
     }
 
 }
+*/

@@ -83,5 +83,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="aerospike-client-3.2.1" level="project" />
+    <orderEntry type="library" name="mongo-java-driver-2.12.3 (3)" level="project" />
   </component>
 </module>

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import gash.router.server.election.ElectionManager;
 import gash.router.server.election.RaftManager;
 import io.netty.channel.ChannelFutureListener;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -46,7 +45,7 @@ public class MessageServer implements RoutingConfSubject{//}, Runnable{
 	protected static HashMap<Integer, ServerBootstrap> bootstrap = new HashMap<Integer, ServerBootstrap>();
 	private static EdgeMonitor emon=null; // added by Manthan
 	private static RaftManager mgr = null;//Pranav
-	private static ElectionManager emgr = null; // Pranav
+	//private static ElectionManager emgr = null; // Pranav
 	private ArrayList<RoutingConfObserver> routingConfOberverList;// added by Manthan
 
 	// public static final String sPort = "port";
@@ -88,7 +87,7 @@ public class MessageServer implements RoutingConfSubject{//}, Runnable{
 		confUpdateThread.start();
 		//Pranav - raft
 		mgr = RaftManager.initManager(conf);
-		emgr = ElectionManager.initManager(conf);
+		//emgr = ElectionManager.initManager(conf);
 		System.out.print("Raft: " + mgr);
 
 		if (!conf.isInternalNode()) {

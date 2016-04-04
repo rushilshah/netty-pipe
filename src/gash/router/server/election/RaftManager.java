@@ -48,11 +48,11 @@ public class RaftManager implements ElectionListener{
         return instance.get();
     }
 
-    public void processRequest(Work.WorkMessage msg)
+    public void processRequest(Work.WorkRequest msg)
     {
-        if (!msg.hasRaftmsg())
+        if (!msg.getPayload().hasRaftmsg())
             return;
-        pipe.election.Election.RaftMessage rm = msg.getRaftmsg();
+        pipe.election.Election.RaftMessage rm = msg.getPayload().getRaftmsg();
         // when a new node joins the network it will want to know who the leader
         // is - we kind of ram this request-response in the process request
         if (rm.getRaftAction().getNumber() == pipe.election.Election.RaftMessage.RaftAction.WHOISTHELEADER_VALUE) {
@@ -61,7 +61,7 @@ public class RaftManager implements ElectionListener{
         }
         // else respond to the message using process Function in RaftElection
 
-        Work.WorkMessage rtn = electionInstance().process(msg);
+        Work.WorkRequest rtn = electionInstance().process(msg);
         if (rtn != null)
         {
             for(EdgeInfo ei : EdgeMonitor.getInstance().getOutboundEdgeInfoList())
@@ -133,7 +133,7 @@ public class RaftManager implements ElectionListener{
 
     }
 
-    private void respondToWhoIsTheLeader(Work.WorkMessage msg) {
+    private void respondToWhoIsTheLeader(Work.WorkRequest msg) {
         if (this.leaderNode == null) {
             logger.info("----> I cannot respond to who the leader is! I don't know!");
             return;
@@ -150,14 +150,14 @@ public class RaftManager implements ElectionListener{
         rmb.setLeader(this.leaderNode);
         rmb.setRaftAction(pipe.election.Election.RaftMessage.RaftAction.THELEADERIS);
 
-        Work.WorkMessage.Builder wb = Work.WorkMessage.newBuilder();
+        Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
         wb.setHeader(hb.build());
-        wb.setRaftmsg(rmb);
+        wb.getPayloadBuilder().setRaftmsg(rmb);
         writeAndFlush(wb.build());
 
     }
 
-    private void writeAndFlush(Work.WorkMessage msg) {
+    private void writeAndFlush(Work.WorkRequest msg) {
         for(EdgeInfo ei : EdgeMonitor.getInstance().getOutboundEdgeInfoList())
         {
             if(ei.isActive() && ei.getChannel() != null)

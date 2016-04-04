@@ -49,12 +49,12 @@ public class RaftElection implements gash.router.server.election.Election {
         currentstate = RState.Follower;
     }
 
-    public Work.WorkMessage process (Work.WorkMessage workMessage) {
-        if (!workMessage.hasRaftmsg())
+    public Work.WorkRequest process (Work.WorkRequest workMessage) {
+        if (!workMessage.getPayload().hasRaftmsg())
             return null;
-        Election.RaftMessage rm = workMessage.getRaftmsg();
+        Election.RaftMessage rm = workMessage.getPayload().getRaftmsg();
 
-        Work.WorkMessage msg = null;
+        Work.WorkRequest msg = null;
         if (rm.getRaftAction().getNumber() == Election.RaftMessage.RaftAction.REQUESTVOTE_VALUE) {
             if (currentstate == RState.Follower || currentstate == RState.Candidate) {
                 this.lastKnownBeat = System.currentTimeMillis();
@@ -144,7 +144,7 @@ public class RaftElection implements gash.router.server.election.Election {
         }
     }
 
-    private Work.WorkMessage sendMessage() {
+    private Work.WorkRequest sendMessage() {
         Election.RaftMessage.Builder rm = Election.RaftMessage.newBuilder();
         Common.Header.Builder hb = Common.Header.newBuilder();
         hb.setTime(System.currentTimeMillis());
@@ -153,9 +153,9 @@ public class RaftElection implements gash.router.server.election.Election {
         rm.setTerm(term);
         rm.setRaftAction(Election.RaftMessage.RaftAction.LEADER);
 
-        Work.WorkMessage.Builder wb = Work.WorkMessage.newBuilder();
+        Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
         wb.setHeader(hb);
-        wb.setRaftmsg(rm);
+        wb.getPayloadBuilder().setRaftmsg(rm);
         wb.setSecret(12345678);
         return wb.build();
     }
@@ -165,7 +165,7 @@ public class RaftElection implements gash.router.server.election.Election {
         listener.concludeWith(b,nodeId);
     }
 
-    private synchronized Work.WorkMessage castvote() {
+    private synchronized Work.WorkRequest castvote() {
         Election.RaftMessage.Builder rm = Election.RaftMessage.newBuilder();
         Common.Header.Builder hb = Common.Header.newBuilder();
         hb.setTime(System.currentTimeMillis());
@@ -174,16 +174,16 @@ public class RaftElection implements gash.router.server.election.Election {
         //Raft message initialization
         rm.setTerm(term);
         rm.setRaftAction(Election.RaftMessage.RaftAction.VOTE);
-        Work.WorkMessage.Builder wb = Work.WorkMessage.newBuilder();
+        Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
         wb.setHeader(hb.build());
-        wb.setRaftmsg(rm.build());
+        wb.getPayloadBuilder().setRaftmsg(rm.build());
         wb.setSecret(12345678);
 
         return wb.build();
 
     }
 
-    public Work.WorkMessage sendAppendNotice() {
+    public Work.WorkRequest sendAppendNotice() {
         logger.info("Leader Node " + this.nodeId + " sending appendAction HB RPC's");
         Election.RaftMessage.Builder rm = Election.RaftMessage.newBuilder();
         Common.Header.Builder hb = Common.Header.newBuilder();
@@ -214,9 +214,9 @@ public class RaftElection implements gash.router.server.election.Election {
         rm.setTerm(term);
         rm.setRaftAction(Election.RaftMessage.RaftAction.APPEND);
         // Raft Message to be added
-        Work.WorkMessage.Builder wb = Work.WorkMessage.newBuilder();
+        Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
         wb.setHeader(hb.build());
-        wb.setRaftmsg(rm);
+        wb.getPayloadBuilder().setRaftmsg(rm);
         return wb.build();
         //}
     }
@@ -249,7 +249,7 @@ public class RaftElection implements gash.router.server.election.Election {
 
     }
 
-    private Work.WorkMessage sendRequestVoteNotice() {
+    private Work.WorkRequest sendRequestVoteNotice() {
         Election.RaftMessage.Builder rm = RaftMessage.newBuilder();
         Common.Header.Builder hb = Common.Header.newBuilder();
         hb.setTime(System.currentTimeMillis());
@@ -263,9 +263,9 @@ public class RaftElection implements gash.router.server.election.Election {
         rm.setPrevTerm(this.getLm().getPrevLogTerm());
 
 
-        Work.WorkMessage.Builder wb = Work.WorkMessage.newBuilder();
+        Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
         wb.setHeader(hb.build());
-        wb.setRaftmsg(rm.build());
+        wb.getPayloadBuilder().setRaftmsg(rm.build());
         wb.setSecret(12345678);
         return wb.build();
     }

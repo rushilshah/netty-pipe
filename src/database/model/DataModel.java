@@ -3,18 +3,19 @@ package database.model;
 /**
  * Created by manthan on 4/3/16.
  */
-public class MongoDataModel {
+public class DataModel {
     String name;
     String seqNumber;
     byte[] dataChunk;
 
-    public MongoDataModel(String name, byte[] dataChunk){
+
+    public DataModel(String name, byte[] dataChunk){
         this.name = name;
         this.seqNumber = "";
         this.dataChunk = dataChunk;
     }
 
-    public MongoDataModel(String name, String seqNumber, byte[] dataChunk){
+    public DataModel(String name, String seqNumber, byte[] dataChunk){
         this.name = name;
         this.seqNumber = seqNumber;
         this.dataChunk = dataChunk;

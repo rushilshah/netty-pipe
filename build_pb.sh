@@ -29,3 +29,4 @@ $PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${proj
 $PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/storage.proto
 $PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/global.proto
 $PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/pipe.proto
+$PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/monitor.proto

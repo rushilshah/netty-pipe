@@ -38,6 +38,7 @@ public class RoutingConf {
 	private boolean internalNode = true;
 	private int heartbeatDt = 2000;
 	private List<RoutingEntry> routing;
+	private List<RoutingEntry> adapterRouting;
 	private String electionImplementation;
 
 	public HashMap<String, Integer> asHashMap() {
@@ -114,6 +115,24 @@ public class RoutingConf {
 
 	public void setElectionImplementation(String electionImplementation) {
 		this.electionImplementation = electionImplementation;
+	}
+
+	public List<RoutingEntry> getAdapterRouting() {
+		return adapterRouting;
+	}
+
+	public void setAdapterRouting(List<RoutingEntry> adapterRouting) {
+		this.adapterRouting = adapterRouting;
+	}
+
+	public void addAdapterEntry(RoutingEntry entry) {
+		if (entry == null)
+			return;
+
+		if (adapterRouting == null)
+			adapterRouting = new ArrayList<RoutingEntry>();
+
+		adapterRouting.add(entry);
 	}
 
 	@XmlRootElement(name = "entry")

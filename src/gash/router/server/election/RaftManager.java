@@ -1,5 +1,6 @@
 package gash.router.server.election;
 
+import database.model.DataModel;
 import gash.router.container.ClusterConfList;
 import gash.router.container.RoutingConf;
 import gash.router.server.CommandInit;
@@ -30,6 +31,8 @@ public class RaftManager implements ElectionListener{
     private static RoutingConf conf;
     private static long lastKnownBeat = System.currentTimeMillis();
     private static ClusterConfList clusterConf;
+
+    public static HashMap<Integer,HashSet<DataModel>> clusterFileInfo = new HashMap<>();
 
     private int firstTime = 2;
     private Election election;
@@ -200,6 +203,25 @@ public class RaftManager implements ElectionListener{
         entries.put(logIndex,imageName);
         lm.setEntries(entries);
         ((RaftElection) electionInstance()).setAppendLogs(true);
+    }
+
+    public void askForFiles(){
+
+    }
+
+    public boolean checkIfFileIsInCluster(DataModel data){
+
+        boolean flag = false;
+        Integer nodeId=0;
+        for(Map.Entry<Integer,HashSet<DataModel>> entry: clusterFileInfo.entrySet() ){
+            if(entry.getValue().contains(data)){
+                flag = true;
+                nodeId = entry.getKey();
+                break;
+            }
+        }
+
+        return flag;
 
     }
 

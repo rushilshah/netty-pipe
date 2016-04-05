@@ -7,6 +7,7 @@ import gash.router.server.PrintUtil;
 import gash.router.server.queue.ChannelQueue;
 import gash.router.server.queue.PerChannelGlobalCommandQueue;
 import global.Global;
+import pipe.common.Common;
 import pipe.work.Work;
 import routing.Pipe;
 import storage.Storage;
@@ -34,15 +35,19 @@ public class Query extends Resource {
             switch (query.getAction()) {
                 case GET:
                     PrintUtil.printGlobalCommand(msg);
-                    /*ArrayList<DataModel> arrRespData = MongoDAO.getData("temp",new DataModel(query.getKey(),null));
+                    ArrayList<DataModel> arrRespData = MongoDAO.getData("temp",new DataModel(query.getKey(),null));
                     for(DataModel dataModel : arrRespData){
+                        Global.GlobalCommandMessage.Builder gb = Global.GlobalCommandMessage.newBuilder();
+
+                        Common.Header.Builder hb = Common.Header.newBuilder();
+
                         Storage.Response.Builder rb = Storage.Response.newBuilder();
                         rb.setAction(Storage.Action.GET);
                         rb.setSuccess(true);
                         rb.setKey(dataModel.getName());
                         rb.setSequenceNo(dataModel.getSeqNumber());
                         rb.setData(ByteString.copyFrom(dataModel.getDataChunk()));
-                    }*/
+                    }
                     break;
                 case STORE:
                     /*int result = MongoDAO.saveData("temp",new DataModel(query.getKey(),query.getSequenceNo(),query.getData().toByteArray()));

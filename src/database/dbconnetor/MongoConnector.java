@@ -43,6 +43,7 @@ public class MongoConnector {
                 if(connectionMap.containsKey(dbConfig))
                     mc = connectionMap.get(dbConfig);
                 else {
+                    logger.info("Connecting Mongo to <host,port> :"+dbConfig.getHost()+dbConfig.getPort());
                     mc = new MongoClient(dbConfig.getHost(),dbConfig.getPort());
                     connectionMap.put(dbConfig,mc);
                 }

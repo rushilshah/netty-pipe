@@ -55,4 +55,22 @@ public class DataModel {
     public void setSeqSize(int seqSize) {
         this.seqSize = seqSize;
     }
+
+    public boolean equals(Object x){
+        DataModel that = (DataModel) x;
+        if(this.getName() == that.getName() && this.getSeqNumber() == that.seqNumber){
+            if(this.getDataChunk() == null || that.getDataChunk() == null){
+                return true;
+            }
+            else{
+                return (this.dataChunk.equals(that.dataChunk));
+            }
+        }
+        else
+            return false;
+    }
+
+    public int hashCode(){
+        return this.getName().hashCode() + this.getSeqNumber();
+    }
 }

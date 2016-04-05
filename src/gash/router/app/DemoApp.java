@@ -97,11 +97,11 @@ public class DemoApp implements CommListener {
 			DemoApp da = new DemoApp(mc);
 
 			// do stuff w/ the connection
-			da.ping(20);
+			da.ping(2);
 
 			da.message("Hello System!!");
 
-			da.save("/Users//rushil/Downloads/work-stealing2.pdf");
+			da.save("/home/manthan/Documents/Semester2/275/Lectures/work-stealing2.pdf");
 
 			System.out.println("\n** exiting in 10 seconds. **");
 			System.out.flush();

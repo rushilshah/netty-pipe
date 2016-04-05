@@ -45,9 +45,9 @@ public class RaftElection implements gash.router.server.election.Election {
 
     public RaftElection()
     {
-        this.timeElection = new Random().nextInt(20000);
+        this.timeElection = new Random().nextInt(30000);
         if(this.timeElection < 15000)
-            this.timeElection += 7000;
+            this.timeElection += 17000;
         logger.info("Election timeout duration: " + this.timeElection);
         currentstate = RState.Follower;
     }
@@ -75,7 +75,11 @@ public class RaftElection implements gash.router.server.election.Election {
                     msg = castvote();
                 }
             }
-        } else if (rm.getRaftAction().getNumber() == Election.RaftMessage.RaftAction.LEADER_VALUE) {
+        }
+        if (rm.getRaftAction().getNumber() == Election.RaftMessage.RaftAction.WHOISTHELEADER_VALUE) {
+			respondToWhoIsTheLeader(workMessage);
+        }
+        else if (rm.getRaftAction().getNumber() == Election.RaftMessage.RaftAction.LEADER_VALUE) {
             if (rm.getTerm() >= this.term) {
                 this.leaderId = workMessage.getHeader().getNodeId();
                 this.term = rm.getTerm();
@@ -83,7 +87,27 @@ public class RaftElection implements gash.router.server.election.Election {
                 notifyl(true, workMessage.getHeader().getNodeId());
                 logger.info("Node " + workMessage.getHeader().getNodeId() + " is the leader");
             }
-        } else if (rm.getRaftAction() == Election.RaftMessage.RaftAction.VOTE) {
+        }
+        else if (rm.getRaftAction() == RaftMessage.RaftAction.THELEADERIS){
+            if (rm.getTerm() >= this.term) {
+                this.leaderId = workMessage.getHeader().getNodeId();
+                this.term = rm.getTerm();
+                this.lastKnownBeat = System.currentTimeMillis();
+                notifyl(true, workMessage.getHeader().getNodeId());
+                logger.info("Node " + workMessage.getHeader().getNodeId() + " is the leader");
+            }
+            if(workMessage.getHeader().getDestination()== 100){
+            for(Channel ch : MessageServer.getEmon().getAllChannel())
+            {
+                if(ch != null) {
+                    workMessage.toBuilder().getHeader().toBuilder().setMaxHops(workMessage.getHeader().getMaxHops() - 1);
+
+                }
+            }
+
+            }
+        }
+        else if (rm.getRaftAction() == Election.RaftMessage.RaftAction.VOTE) {
             if (currentstate == RState.Candidate) {
                 logger.info("Node " + getNodeId() + " Received vote from Node " + workMessage.getHeader().getNodeId() + " votecount" + count);
                 receiveVote(workMessage);
@@ -162,6 +186,17 @@ public class RaftElection implements gash.router.server.election.Election {
             leaderId = this.nodeId;
             logger.info("Leader Elected " + leaderId);
             notifyl(true,leaderId);
+            Common.Header.Builder hb = Common.Header.newBuilder();
+            hb.setMaxHops(6);
+            hb.setNodeId(rm.getHeader().getNodeId());
+            hb.setDestination(100);
+            hb.setTime(rm.getHeader().getTime());
+
+            Election.RaftMessage.Builder rf = RaftMessage.newBuilder();
+            rf.setRaftAction(RaftMessage.RaftAction.THELEADERIS);
+
+            rm.toBuilder().setHeader(hb);
+            rm.getPayload().toBuilder().setRaftmsg(rf);
             for(Channel ch : MessageServer.getEmon().getAllChannel())
             {
                 if(ch != null)
@@ -216,7 +251,7 @@ public class RaftElection implements gash.router.server.election.Election {
         hb.setTime(System.currentTimeMillis());
         hb.setNodeId(this.nodeId);
         hb.setDestination(100);
-        hb.setMaxHops(3);
+        hb.setMaxHops(6);
 
         if(this.appendLogs){
             int tempLogIndex = this.lm.getLogIndex();
@@ -334,6 +369,37 @@ public class RaftElection implements gash.router.server.election.Election {
             }
         }
     }
+
+    private void respondToWhoIsTheLeader(Work.WorkRequest msg) {
+        if (this.leaderId == 0) {
+            logger.info("----> I cannot respond to who the leader is! I don't know!");
+            return;
+        }
+        logger.info("Node " + this.nodeId + " is replying to "
+                + msg.getHeader().getNodeId()
+                + "'s request who the leader is. Its Node " + this.leaderId);
+
+        Common.Header.Builder hb = Common.Header.newBuilder();
+        hb.setNodeId(this.nodeId);
+        hb.setTime(System.currentTimeMillis());
+        hb.setMaxHops(6);
+        hb.setDestination(100);
+
+        pipe.election.Election.RaftMessage.Builder rmb = pipe.election.Election.RaftMessage.newBuilder();
+        rmb.setLeader(this.leaderId);
+        rmb.setRaftAction(pipe.election.Election.RaftMessage.RaftAction.THELEADERIS);
+
+        Work.WorkRequest.Builder wb = Work.WorkRequest.newBuilder();
+        wb.setHeader(hb.build());
+        wb.getPayloadBuilder().setRaftmsg(rmb);
+        for(Channel ch : MessageServer.getEmon().getAllChannel())
+        {
+            if(ch != null)
+                ch.writeAndFlush(wb.build());
+        }
+
+    }
+
     public RState getCurrentState() {
         return currentstate;
     }

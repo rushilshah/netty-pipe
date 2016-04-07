@@ -39,6 +39,7 @@ message Payload{
     optional Query query = 16;
 
     optional Response response = 17;
+    optional bytes storageFile = 18;
 
 }
 

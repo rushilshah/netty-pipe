@@ -98,9 +98,10 @@ public class MongoDAO {
         return imageOfData;
     }
 
-    /*public static void main(String[] args){
-        int result = MongoDAO.saveData("test",new DataModel("hello",1,"okay".getBytes()));
-        System.out.println(result);
-        MongoDAO.getData("test",new DataModel("hello",1,null));
-    }*/
+    public static void main(String[] args){
+        //int result = MongoDAO.saveData("test",new DataModel("hello",1,"okay".getBytes()));
+        //System.out.println(result);
+        ArrayList<DataModel> result = MongoDAO.getData("test",new DataModel("Pranavkumar Masariya_Graduate Student(SE)_SJSU.pdf",0,null));
+        System.out.println(result.size());
+    }
 }

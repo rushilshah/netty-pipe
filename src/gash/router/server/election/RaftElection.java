@@ -152,7 +152,7 @@ public class RaftElection implements gash.router.server.election.Election {
 
                 }
             }
-            if(workMessage.getHeader().getDestination() == 100)
+            if(workMessage.getHeader().getDestination() == 100 && workMessage.getHeader().getMaxHops() >0)
             {
                 for(Channel ch : MessageServer.getEmon().getAllChannel())
                 {

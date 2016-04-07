@@ -89,8 +89,8 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String host = args[0]; //127.0.0.1
-		int port = Integer.parseInt(args[1]); //4568
+		String host = "192.168.1.152";//args[0]; //127.0.0.1
+		int port = 4267;//Integer.parseInt(args[1]); //4568
 
 		try {
 			MessageClient mc = new MessageClient(host, port);
@@ -101,7 +101,7 @@ public class DemoApp implements CommListener {
 
 			da.message("Hello System!!");
 
-			da.save("/home/manthan/Documents/Semester2/275/Lectures/work-stealing2.pdf");
+			//da.save("/home/manthan/Documents/Semester2/275/Lectures/work-stealing2.pdf");
 
 			System.out.println("\n** exiting in 10 seconds. **");
 			System.out.flush();

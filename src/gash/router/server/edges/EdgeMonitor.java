@@ -266,7 +266,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	}
 
 	public synchronized void addToInbound(EdgeInfo ei) {
-		if(ei.getChannel() != null){
+		if(ei.getChannel() != null && !inboundEdges.isEdge(ei)){
 			logger.info("New inbound edge from node "+ei.getRef()+" being added");
 
 			ei.setQueue(QueueFactory.getInstance(ei.getChannel(),state));

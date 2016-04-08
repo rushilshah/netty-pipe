@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GlobalCommandOutboundAppWorker extends Thread {
-	protected static Logger logger = LoggerFactory.getLogger("server");
+	protected static Logger logger = LoggerFactory.getLogger("gcoaw:server");
 
 	int workerId;
 	PerChannelGlobalCommandQueue sq;

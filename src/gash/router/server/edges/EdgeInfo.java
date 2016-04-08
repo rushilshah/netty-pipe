@@ -89,4 +89,18 @@ public class EdgeInfo {
 	public void setQueue(ChannelQueue queue) {
 		this.queue = queue;
 	}
+
+	public boolean equals(Object x){
+		EdgeInfo that = (EdgeInfo) x;
+		if(this.ref == that.ref && this.host.equals(that.host) && this.port == that.port){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	public int hashCode(){
+		return this.ref + this.host.hashCode() + this.port;
+	}
 }

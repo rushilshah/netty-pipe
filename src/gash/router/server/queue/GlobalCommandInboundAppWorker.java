@@ -30,7 +30,7 @@ import pipe.work.Work;
 import routing.Pipe;
 
 public class GlobalCommandInboundAppWorker extends Thread {
-	protected static Logger logger = LoggerFactory.getLogger("server");
+	protected static Logger logger = LoggerFactory.getLogger("gciaw:server");
 
 	int workerId;
 	PerChannelGlobalCommandQueue sq;
@@ -111,6 +111,9 @@ public class GlobalCommandInboundAppWorker extends Thread {
 						}
 					}else if(req.hasQuery()){
 						new Query(sq).handle(req);
+					}
+					else{
+						logger.error("Unexpected message type. Yet to handle.");
 					}
 
 				}

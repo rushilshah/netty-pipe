@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import pipe.work.Work;
 
 public class WorkOutboundAppWorker extends Thread {
-	protected static Logger logger = LoggerFactory.getLogger("server");
+	protected static Logger logger = LoggerFactory.getLogger("woaw:server");
 
 	int workerId;
 	PerChannelWorkQueue sq;

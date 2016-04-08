@@ -21,6 +21,7 @@ import gash.router.server.PrintUtil;
 import gash.router.server.edges.EdgeInfo;
 import gash.router.server.edges.EdgeMonitor;
 import gash.router.server.election.RaftManager;
+import gash.router.server.resources.Query;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ import pipe.work.Work;
 import routing.Pipe;
 
 public class WorkInboundAppWorker extends Thread {
-	protected static Logger logger = LoggerFactory.getLogger("server");
+	protected static Logger logger = LoggerFactory.getLogger("wiaw:server");
 
 	int workerId;
 	PerChannelWorkQueue sq;
@@ -134,7 +135,11 @@ public class WorkInboundAppWorker extends Thread {
 							}
 						}
 
-					} else if (payload.hasErr()) {
+					}else if (payload.hasQuery()) {
+						logger.debug("Query message on work channel from " + req.getHeader().getNodeId());
+						new Query(sq).handle(req);
+					}
+					else if (payload.hasErr()) {
 						Common.Failure err = payload.getErr();
 						logger.error("failure from " + req.getHeader().getNodeId());
 						// PrintUtil.printFailure(err);

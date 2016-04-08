@@ -27,7 +27,7 @@ import pipe.work.Work;
 import routing.Pipe;
 
 public class CommandInboundAppWorker extends Thread {
-	protected static Logger logger = LoggerFactory.getLogger("server");
+	protected static Logger logger = LoggerFactory.getLogger("ciaw:server");
 
 	int workerId;
 	PerChannelCommandQueue sq;

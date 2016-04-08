@@ -73,4 +73,6 @@ public class DataModel {
     public int hashCode(){
         return this.getName().hashCode() + this.getSeqNumber();
     }
+
+
 }

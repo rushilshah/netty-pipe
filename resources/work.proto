@@ -22,6 +22,11 @@ message Task {
     required int32 seq_id = 2;
 }
 
+message SavedFile{
+    optional string key = 12;
+    optional int32 sequence_no = 14;
+}
+
 message Payload{
     optional Failure err = 3;
 
@@ -39,6 +44,8 @@ message Payload{
     optional Query query = 16;
 
     optional Response response = 17;
+    optional bytes storageFile = 18;
+    optional SavedFile savedFile = 19;
 
 }
 

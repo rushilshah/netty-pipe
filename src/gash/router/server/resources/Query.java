@@ -52,12 +52,14 @@ public class Query extends Resource {
                     }
                     break;
                 case STORE:
-                    int result = MongoDAO.saveData("test",new DataModel(query.getKey(),query.getSequenceNo(),query.getData().toByteArray()));
-                    Storage.Response.Builder rb = Storage.Response.newBuilder();
-                    rb.setAction(Storage.Action.GET);
-                    rb.setSuccess(result>0);
-                    logger.info("Result of save data in mongo :"+ result);
-                    PrintUtil.printGlobalCommand(msg);
+                    if(MongoDAO.isSufficientSpace("test")) {
+                        int result = MongoDAO.saveData("test", new DataModel(query.getKey(), query.getSequenceNo(), query.getData().toByteArray()));
+                        Storage.Response.Builder rb = Storage.Response.newBuilder();
+                        rb.setAction(Storage.Action.GET);
+                        rb.setSuccess(result > 0);
+                        logger.info("Result of save data in mongo :" + result);
+                        PrintUtil.printGlobalCommand(msg);
+                    }
                     break;
                 case UPDATE:
                 case DELETE:

@@ -1524,6 +1524,560 @@ public final class Work {
     // @@protoc_insertion_point(class_scope:Task)
   }
 
+  public interface SavedFileOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:SavedFile)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional string key = 12;</code>
+     */
+    boolean hasKey();
+    /**
+     * <code>optional string key = 12;</code>
+     */
+    java.lang.String getKey();
+    /**
+     * <code>optional string key = 12;</code>
+     */
+    com.google.protobuf.ByteString
+        getKeyBytes();
+
+    /**
+     * <code>optional int32 sequence_no = 14;</code>
+     */
+    boolean hasSequenceNo();
+    /**
+     * <code>optional int32 sequence_no = 14;</code>
+     */
+    int getSequenceNo();
+  }
+  /**
+   * Protobuf type {@code SavedFile}
+   */
+  public static final class SavedFile extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:SavedFile)
+      SavedFileOrBuilder {
+    // Use SavedFile.newBuilder() to construct.
+    private SavedFile(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private SavedFile(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final SavedFile defaultInstance;
+    public static SavedFile getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public SavedFile getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private SavedFile(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 98: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000001;
+              key_ = bs;
+              break;
+            }
+            case 112: {
+              bitField0_ |= 0x00000002;
+              sequenceNo_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return pipe.work.Work.internal_static_SavedFile_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return pipe.work.Work.internal_static_SavedFile_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              pipe.work.Work.SavedFile.class, pipe.work.Work.SavedFile.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<SavedFile> PARSER =
+        new com.google.protobuf.AbstractParser<SavedFile>() {
+      public SavedFile parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SavedFile(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SavedFile> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int KEY_FIELD_NUMBER = 12;
+    private java.lang.Object key_;
+    /**
+     * <code>optional string key = 12;</code>
+     */
+    public boolean hasKey() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional string key = 12;</code>
+     */
+    public java.lang.String getKey() {
+      java.lang.Object ref = key_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          key_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string key = 12;</code>
+     */
+    public com.google.protobuf.ByteString
+        getKeyBytes() {
+      java.lang.Object ref = key_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        key_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int SEQUENCE_NO_FIELD_NUMBER = 14;
+    private int sequenceNo_;
+    /**
+     * <code>optional int32 sequence_no = 14;</code>
+     */
+    public boolean hasSequenceNo() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional int32 sequence_no = 14;</code>
+     */
+    public int getSequenceNo() {
+      return sequenceNo_;
+    }
+
+    private void initFields() {
+      key_ = "";
+      sequenceNo_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(12, getKeyBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt32(14, sequenceNo_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, getKeyBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(14, sequenceNo_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static pipe.work.Work.SavedFile parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static pipe.work.Work.SavedFile parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static pipe.work.Work.SavedFile parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static pipe.work.Work.SavedFile parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static pipe.work.Work.SavedFile parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static pipe.work.Work.SavedFile parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static pipe.work.Work.SavedFile parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static pipe.work.Work.SavedFile parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static pipe.work.Work.SavedFile parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static pipe.work.Work.SavedFile parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(pipe.work.Work.SavedFile prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code SavedFile}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:SavedFile)
+        pipe.work.Work.SavedFileOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return pipe.work.Work.internal_static_SavedFile_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return pipe.work.Work.internal_static_SavedFile_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                pipe.work.Work.SavedFile.class, pipe.work.Work.SavedFile.Builder.class);
+      }
+
+      // Construct using pipe.work.Work.SavedFile.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        key_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        sequenceNo_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return pipe.work.Work.internal_static_SavedFile_descriptor;
+      }
+
+      public pipe.work.Work.SavedFile getDefaultInstanceForType() {
+        return pipe.work.Work.SavedFile.getDefaultInstance();
+      }
+
+      public pipe.work.Work.SavedFile build() {
+        pipe.work.Work.SavedFile result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public pipe.work.Work.SavedFile buildPartial() {
+        pipe.work.Work.SavedFile result = new pipe.work.Work.SavedFile(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.key_ = key_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.sequenceNo_ = sequenceNo_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof pipe.work.Work.SavedFile) {
+          return mergeFrom((pipe.work.Work.SavedFile)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(pipe.work.Work.SavedFile other) {
+        if (other == pipe.work.Work.SavedFile.getDefaultInstance()) return this;
+        if (other.hasKey()) {
+          bitField0_ |= 0x00000001;
+          key_ = other.key_;
+          onChanged();
+        }
+        if (other.hasSequenceNo()) {
+          setSequenceNo(other.getSequenceNo());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        pipe.work.Work.SavedFile parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (pipe.work.Work.SavedFile) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object key_ = "";
+      /**
+       * <code>optional string key = 12;</code>
+       */
+      public boolean hasKey() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional string key = 12;</code>
+       */
+      public java.lang.String getKey() {
+        java.lang.Object ref = key_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            key_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string key = 12;</code>
+       */
+      public com.google.protobuf.ByteString
+          getKeyBytes() {
+        java.lang.Object ref = key_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          key_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string key = 12;</code>
+       */
+      public Builder setKey(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        key_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string key = 12;</code>
+       */
+      public Builder clearKey() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        key_ = getDefaultInstance().getKey();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string key = 12;</code>
+       */
+      public Builder setKeyBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        key_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int sequenceNo_ ;
+      /**
+       * <code>optional int32 sequence_no = 14;</code>
+       */
+      public boolean hasSequenceNo() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int32 sequence_no = 14;</code>
+       */
+      public int getSequenceNo() {
+        return sequenceNo_;
+      }
+      /**
+       * <code>optional int32 sequence_no = 14;</code>
+       */
+      public Builder setSequenceNo(int value) {
+        bitField0_ |= 0x00000002;
+        sequenceNo_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 sequence_no = 14;</code>
+       */
+      public Builder clearSequenceNo() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        sequenceNo_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:SavedFile)
+    }
+
+    static {
+      defaultInstance = new SavedFile(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:SavedFile)
+  }
+
   public interface PayloadOrBuilder extends
       // @@protoc_insertion_point(interface_extends:Payload)
       com.google.protobuf.MessageOrBuilder {
@@ -1673,6 +2227,28 @@ public final class Work {
      * <code>optional .Response response = 17;</code>
      */
     storage.Storage.ResponseOrBuilder getResponseOrBuilder();
+
+    /**
+     * <code>optional bytes storageFile = 18;</code>
+     */
+    boolean hasStorageFile();
+    /**
+     * <code>optional bytes storageFile = 18;</code>
+     */
+    com.google.protobuf.ByteString getStorageFile();
+
+    /**
+     * <code>optional .SavedFile savedFile = 19;</code>
+     */
+    boolean hasSavedFile();
+    /**
+     * <code>optional .SavedFile savedFile = 19;</code>
+     */
+    pipe.work.Work.SavedFile getSavedFile();
+    /**
+     * <code>optional .SavedFile savedFile = 19;</code>
+     */
+    pipe.work.Work.SavedFileOrBuilder getSavedFileOrBuilder();
   }
   /**
    * Protobuf type {@code Payload}
@@ -1846,6 +2422,24 @@ public final class Work {
                 response_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000200;
+              break;
+            }
+            case 146: {
+              bitField0_ |= 0x00000400;
+              storageFile_ = input.readBytes();
+              break;
+            }
+            case 154: {
+              pipe.work.Work.SavedFile.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000800) == 0x00000800)) {
+                subBuilder = savedFile_.toBuilder();
+              }
+              savedFile_ = input.readMessage(pipe.work.Work.SavedFile.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(savedFile_);
+                savedFile_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000800;
               break;
             }
           }
@@ -2112,6 +2706,42 @@ public final class Work {
       return response_;
     }
 
+    public static final int STORAGEFILE_FIELD_NUMBER = 18;
+    private com.google.protobuf.ByteString storageFile_;
+    /**
+     * <code>optional bytes storageFile = 18;</code>
+     */
+    public boolean hasStorageFile() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional bytes storageFile = 18;</code>
+     */
+    public com.google.protobuf.ByteString getStorageFile() {
+      return storageFile_;
+    }
+
+    public static final int SAVEDFILE_FIELD_NUMBER = 19;
+    private pipe.work.Work.SavedFile savedFile_;
+    /**
+     * <code>optional .SavedFile savedFile = 19;</code>
+     */
+    public boolean hasSavedFile() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional .SavedFile savedFile = 19;</code>
+     */
+    public pipe.work.Work.SavedFile getSavedFile() {
+      return savedFile_;
+    }
+    /**
+     * <code>optional .SavedFile savedFile = 19;</code>
+     */
+    public pipe.work.Work.SavedFileOrBuilder getSavedFileOrBuilder() {
+      return savedFile_;
+    }
+
     private void initFields() {
       err_ = pipe.common.Common.Failure.getDefaultInstance();
       ping_ = false;
@@ -2123,6 +2753,8 @@ public final class Work {
       election_ = pipe.election.Election.LeaderElection.getDefaultInstance();
       query_ = storage.Storage.Query.getDefaultInstance();
       response_ = storage.Storage.Response.getDefaultInstance();
+      storageFile_ = com.google.protobuf.ByteString.EMPTY;
+      savedFile_ = pipe.work.Work.SavedFile.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2215,6 +2847,12 @@ public final class Work {
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeMessage(17, response_);
       }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeBytes(18, storageFile_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeMessage(19, savedFile_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -2263,6 +2901,14 @@ public final class Work {
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(17, response_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(18, storageFile_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(19, savedFile_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2382,6 +3028,7 @@ public final class Work {
           getElectionFieldBuilder();
           getQueryFieldBuilder();
           getResponseFieldBuilder();
+          getSavedFileFieldBuilder();
         }
       }
       private static Builder create() {
@@ -2446,6 +3093,14 @@ public final class Work {
           responseBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000200);
+        storageFile_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        if (savedFileBuilder_ == null) {
+          savedFile_ = pipe.work.Work.SavedFile.getDefaultInstance();
+        } else {
+          savedFileBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -2550,6 +3205,18 @@ public final class Work {
         } else {
           result.response_ = responseBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.storageFile_ = storageFile_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        if (savedFileBuilder_ == null) {
+          result.savedFile_ = savedFile_;
+        } else {
+          result.savedFile_ = savedFileBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2595,6 +3262,12 @@ public final class Work {
         }
         if (other.hasResponse()) {
           mergeResponse(other.getResponse());
+        }
+        if (other.hasStorageFile()) {
+          setStorageFile(other.getStorageFile());
+        }
+        if (other.hasSavedFile()) {
+          mergeSavedFile(other.getSavedFile());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -3799,6 +4472,157 @@ public final class Work {
         return responseBuilder_;
       }
 
+      private com.google.protobuf.ByteString storageFile_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes storageFile = 18;</code>
+       */
+      public boolean hasStorageFile() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional bytes storageFile = 18;</code>
+       */
+      public com.google.protobuf.ByteString getStorageFile() {
+        return storageFile_;
+      }
+      /**
+       * <code>optional bytes storageFile = 18;</code>
+       */
+      public Builder setStorageFile(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        storageFile_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes storageFile = 18;</code>
+       */
+      public Builder clearStorageFile() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        storageFile_ = getDefaultInstance().getStorageFile();
+        onChanged();
+        return this;
+      }
+
+      private pipe.work.Work.SavedFile savedFile_ = pipe.work.Work.SavedFile.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.work.Work.SavedFile, pipe.work.Work.SavedFile.Builder, pipe.work.Work.SavedFileOrBuilder> savedFileBuilder_;
+      /**
+       * <code>optional .SavedFile savedFile = 19;</code>
+       */
+      public boolean hasSavedFile() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional .SavedFile savedFile = 19;</code>
+       */
+      public pipe.work.Work.SavedFile getSavedFile() {
+        if (savedFileBuilder_ == null) {
+          return savedFile_;
+        } else {
+          return savedFileBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .SavedFile savedFile = 19;</code>
+       */
+      public Builder setSavedFile(pipe.work.Work.SavedFile value) {
+        if (savedFileBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          savedFile_ = value;
+          onChanged();
+        } else {
+          savedFileBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .SavedFile savedFile = 19;</code>
+       */
+      public Builder setSavedFile(
+          pipe.work.Work.SavedFile.Builder builderForValue) {
+        if (savedFileBuilder_ == null) {
+          savedFile_ = builderForValue.build();
+          onChanged();
+        } else {
+          savedFileBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .SavedFile savedFile = 19;</code>
+       */
+      public Builder mergeSavedFile(pipe.work.Work.SavedFile value) {
+        if (savedFileBuilder_ == null) {
+          if (((bitField0_ & 0x00000800) == 0x00000800) &&
+              savedFile_ != pipe.work.Work.SavedFile.getDefaultInstance()) {
+            savedFile_ =
+              pipe.work.Work.SavedFile.newBuilder(savedFile_).mergeFrom(value).buildPartial();
+          } else {
+            savedFile_ = value;
+          }
+          onChanged();
+        } else {
+          savedFileBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .SavedFile savedFile = 19;</code>
+       */
+      public Builder clearSavedFile() {
+        if (savedFileBuilder_ == null) {
+          savedFile_ = pipe.work.Work.SavedFile.getDefaultInstance();
+          onChanged();
+        } else {
+          savedFileBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
+        return this;
+      }
+      /**
+       * <code>optional .SavedFile savedFile = 19;</code>
+       */
+      public pipe.work.Work.SavedFile.Builder getSavedFileBuilder() {
+        bitField0_ |= 0x00000800;
+        onChanged();
+        return getSavedFileFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .SavedFile savedFile = 19;</code>
+       */
+      public pipe.work.Work.SavedFileOrBuilder getSavedFileOrBuilder() {
+        if (savedFileBuilder_ != null) {
+          return savedFileBuilder_.getMessageOrBuilder();
+        } else {
+          return savedFile_;
+        }
+      }
+      /**
+       * <code>optional .SavedFile savedFile = 19;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.work.Work.SavedFile, pipe.work.Work.SavedFile.Builder, pipe.work.Work.SavedFileOrBuilder> 
+          getSavedFileFieldBuilder() {
+        if (savedFileBuilder_ == null) {
+          savedFileBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              pipe.work.Work.SavedFile, pipe.work.Work.SavedFile.Builder, pipe.work.Work.SavedFileOrBuilder>(
+                  getSavedFile(),
+                  getParentForChildren(),
+                  isClean());
+          savedFile_ = null;
+        }
+        return savedFileBuilder_;
+      }
+
       // @@protoc_insertion_point(builder_scope:Payload)
     }
 
@@ -4641,6 +5465,11 @@ public final class Work {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Task_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_SavedFile_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_SavedFile_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Payload_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -4663,16 +5492,19 @@ public final class Work {
       "to\032\rstorage.proto\"0\n\tWorkState\022\020\n\010enqueu" +
       "ed\030\001 \002(\005\022\021\n\tprocessed\030\002 \002(\005\"&\n\tHeartbeat" +
       "\022\031\n\005state\030\001 \002(\0132\n.WorkState\")\n\004Task\022\021\n\ts" +
-      "eries_id\030\001 \002(\003\022\016\n\006seq_id\030\002 \002(\005\"\215\002\n\007Paylo" +
-      "ad\022\025\n\003err\030\003 \001(\0132\010.Failure\022\014\n\004ping\030\004 \001(\010\022" +
-      "\030\n\004beat\030\005 \001(\0132\n.Heartbeat\022\023\n\004task\030\006 \001(\0132" +
-      "\005.Task\022\031\n\005state\030\007 \001(\0132\n.WorkState\022\035\n\006lea" +
-      "der\030\010 \001(\0132\r.LeaderStatus\022\035\n\007raftmsg\030\t \001(" +
-      "\0132\014.RaftMessage\022!\n\010election\030\n \001(\0132\017.Lead",
-      "erElection\022\025\n\005query\030\020 \001(\0132\006.Query\022\033\n\010res" +
-      "ponse\030\021 \001(\0132\t.Response\"Q\n\013WorkRequest\022\027\n" +
-      "\006header\030\001 \002(\0132\007.Header\022\016\n\006secret\030\002 \001(\003\022\031" +
-      "\n\007payload\030\003 \002(\0132\010.PayloadB\r\n\tpipe.workH\001"
+      "eries_id\030\001 \002(\003\022\016\n\006seq_id\030\002 \002(\005\"-\n\tSavedF" +
+      "ile\022\013\n\003key\030\014 \001(\t\022\023\n\013sequence_no\030\016 \001(\005\"\301\002" +
+      "\n\007Payload\022\025\n\003err\030\003 \001(\0132\010.Failure\022\014\n\004ping" +
+      "\030\004 \001(\010\022\030\n\004beat\030\005 \001(\0132\n.Heartbeat\022\023\n\004task" +
+      "\030\006 \001(\0132\005.Task\022\031\n\005state\030\007 \001(\0132\n.WorkState" +
+      "\022\035\n\006leader\030\010 \001(\0132\r.LeaderStatus\022\035\n\007raftm",
+      "sg\030\t \001(\0132\014.RaftMessage\022!\n\010election\030\n \001(\013" +
+      "2\017.LeaderElection\022\025\n\005query\030\020 \001(\0132\006.Query" +
+      "\022\033\n\010response\030\021 \001(\0132\t.Response\022\023\n\013storage" +
+      "File\030\022 \001(\014\022\035\n\tsavedFile\030\023 \001(\0132\n.SavedFil" +
+      "e\"Q\n\013WorkRequest\022\027\n\006header\030\001 \002(\0132\007.Heade" +
+      "r\022\016\n\006secret\030\002 \001(\003\022\031\n\007payload\030\003 \002(\0132\010.Pay" +
+      "loadB\r\n\tpipe.workH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4707,14 +5539,20 @@ public final class Work {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Task_descriptor,
         new java.lang.String[] { "SeriesId", "SeqId", });
-    internal_static_Payload_descriptor =
+    internal_static_SavedFile_descriptor =
       getDescriptor().getMessageTypes().get(3);
+    internal_static_SavedFile_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_SavedFile_descriptor,
+        new java.lang.String[] { "Key", "SequenceNo", });
+    internal_static_Payload_descriptor =
+      getDescriptor().getMessageTypes().get(4);
     internal_static_Payload_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Payload_descriptor,
-        new java.lang.String[] { "Err", "Ping", "Beat", "Task", "State", "Leader", "Raftmsg", "Election", "Query", "Response", });
+        new java.lang.String[] { "Err", "Ping", "Beat", "Task", "State", "Leader", "Raftmsg", "Election", "Query", "Response", "StorageFile", "SavedFile", });
     internal_static_WorkRequest_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_WorkRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_WorkRequest_descriptor,
